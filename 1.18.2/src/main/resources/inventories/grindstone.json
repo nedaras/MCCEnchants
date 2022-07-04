@@ -1,0 +1,84 @@
+{
+  "inventory_name": "Repair & Disenchant",
+  "inventory": [
+    "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE",
+    "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "&left", "&left", "&output display_item", "&right", "&right", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE",
+    "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "&left", "BLACK_STAINED_GLASS_PANE", "&grindstone combine_items", "BLACK_STAINED_GLASS_PANE", "&right", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE",
+    "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", null, "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", null, "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE",
+    "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE",
+    "&valid", "&valid", "&valid", "&valid", "&close~", "&valid", "&valid", "&valid", "&valid"
+  ],
+  "custom_items": {
+    "close": {
+      "material": "BARRIER",
+      "display_name": "&cClose"
+    },
+    "output": {
+      "material": "BARRIER",
+      "display_name": "&cGrindstone",
+      "lore": [
+        "&7Pace a target item in the left",
+        "&7slot and a optinal second item",
+        "&7in the right slot to combine",
+        "&7Enchantments!"
+      ],
+      "states": {
+        "invalid_items": {
+          "material": "BARRIER",
+          "display_name": "&cCannot combine items!",
+          "lore": [
+            "&7These items cannot be combined!"
+          ]
+        }
+      }
+    },
+    "grindstone": {
+      "material": "GRINDSTONE",
+      "display_name": "&aCombine Items",
+      "lore": [
+        "&7Combine the items in the slots",
+        "&7to the left and right below."
+      ],
+      "states": {
+        "valid_items": {
+          "material": "GRINDSTONE",
+          "display_name": "&aCombine Items",
+          "glow": true,
+          "lore": [
+            "&7Combine the items in the slots",
+            "&7to the left and right below.",
+            "",
+            "&eClick to combine!"
+          ]
+        }
+      }
+    },
+    "valid": {
+      "material": "RED_STAINED_GLASS_PANE",
+      "states": {
+        "first_item_valid": {
+          "material": "LIME_STAINED_GLASS_PANE"
+        },
+        "second_item_valid": {
+          "material": "LIME_STAINED_GLASS_PANE"
+        }
+      }
+    },
+    "left": {
+      "material": "RED_STAINED_GLASS_PANE",
+      "states": {
+        "first_item_valid": {
+          "material": "LIME_STAINED_GLASS_PANE"
+        }
+      }
+    },
+    "right": {
+      "material": "RED_STAINED_GLASS_PANE",
+      "states": {
+        "second_item_valid": {
+          "material": "LIME_STAINED_GLASS_PANE"
+        }
+      }
+    }
+  }
+}

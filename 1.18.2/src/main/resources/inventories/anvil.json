@@ -1,0 +1,145 @@
+{
+  "inventory_name": "Anvil",
+  "inventory": [
+    "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE",
+    "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "&upgrade_item", "&upgrade_item", "&output display_item", "&sacrifice_item", "&sacrifice_item", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE",
+    "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "&upgrade_item", "BLACK_STAINED_GLASS_PANE", "&anvil combine_items", "BLACK_STAINED_GLASS_PANE", "&sacrifice_item", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE",
+    "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", null, "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", null, "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE",
+    "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE",
+    "&right", "&right", "&right", "&right", "&close~", "&left", "&left", "&left", "&left"
+  ],
+  "custom_items": {
+    "close": {
+      "material": "BARRIER",
+      "display_name": "&cClose"
+    },
+    "output": {
+      "material": "BARRIER",
+      "display_name": "&cAnvil",
+      "lore": [
+        "&7Pace a target item in the left",
+        "&7slot and a sacrifice item in the",
+        "&7right slot to combine",
+        "&7Enchantments!"
+      ],
+      "states": {
+        "incombinable_items": {
+          "material": "BARRIER",
+          "display_name": "&cCannot combine items!",
+          "lore": [
+            "&7These items cannot be combined!"
+          ]
+        }
+      }
+    },
+    "anvil": {
+      "material": "ANVIL",
+      "display_name": "&aCombine Items",
+      "lore": [
+        "&7Combine the items in the slots",
+        "&7to the left and right below."
+      ],
+      "states": {
+        "combinable_items": {
+          "material": "ANVIL",
+          "display_name": "&aCombine Items",
+          "glow": true,
+          "lore": [
+            "&7Combine the items in the slots",
+            "&7to the left and right below.",
+            "",
+            "&7Cost",
+            "&3%level% Exp levels",
+            "",
+            "&eClick to combine!"
+          ]
+        },
+        "missing_levels": {
+          "material": "ANVIL",
+          "display_name": "&aCombine Items",
+          "glow": true,
+          "lore": [
+            "&7Combine the items in the slots",
+            "&7to the left and right below.",
+            "",
+            "&7Cost",
+            "&3%level% Exp levels",
+            "",
+            "&cYou don't have enough Levels!"
+          ]
+        },
+        "level_to_high": {
+          "material": "ANVIL",
+          "display_name": "&aCombine Items",
+          "glow": true,
+          "lore": [
+            "&7Combine the items in the slots",
+            "&7to the left and right below.",
+            "",
+            "&7Cost",
+            "&3%level% Exp levels",
+            "",
+            "&cLevel limit has been reached!"
+          ]
+        }
+      }
+    },
+    "upgrade_item": {
+      "material": "RED_STAINED_GLASS_PANE",
+      "display_name": "&6Item To Upgrade",
+      "lore": [
+        "&7The item you want to upgrade",
+        "&7should be placed int the slot on",
+        "&7this side."
+      ],
+      "states": {
+        "upgrade_valid": {
+          "material": "LIME_STAINED_GLASS_PANE",
+          "display_name": "&6Item To Upgrade",
+          "lore": [
+            "&7The item you want to upgrade",
+            "&7should be placed int the slot on",
+            "&7this side."
+          ]
+        }
+      }
+    },
+    "sacrifice_item": {
+      "material": "RED_STAINED_GLASS_PANE",
+      "display_name": "&6Item To Sacrifice",
+      "lore": [
+        "&7The item you are sacrificing in",
+        "&7order to upgrade the item on the",
+        "&7left should be placed in the",
+        "&7slot on this side."
+      ],
+      "states": {
+        "sacrifice_valid": {
+          "material": "LIME_STAINED_GLASS_PANE",
+          "display_name": "&6Item To Upgrade",
+          "lore": [
+            "&7The item you want to upgrade",
+            "&7should be placed int the slot on",
+            "&7this side."
+          ]
+        }
+      }
+    },
+    "right": {
+      "material": "RED_STAINED_GLASS_PANE",
+      "states": {
+        "upgrade_valid": {
+          "material": "LIME_STAINED_GLASS_PANE"
+        }
+      }
+    },
+    "left": {
+      "material": "RED_STAINED_GLASS_PANE",
+      "states": {
+        "sacrifice_valid": {
+          "material": "LIME_STAINED_GLASS_PANE"
+        }
+      }
+    }
+  }
+}
