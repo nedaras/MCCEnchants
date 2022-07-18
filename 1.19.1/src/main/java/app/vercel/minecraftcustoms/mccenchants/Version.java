@@ -39,20 +39,18 @@ public class Version {
 
     }
 
-    // IT needs to check better.
-    // for pre versions, that 1.19 is technically the latest, but 1.18.2 is the latest for the 1.18.2 server
     private static void checkForUpdates(JavaPlugin plugin) {
 
         try {
 
             String currentVersion = "1.19-R0.1-SNAPSHOT";
 
-            URL url = new URL("https://minecraftcustoms.vercel.app/api/versions/" + plugin.getName().toLowerCase());
+            URL url = new URL("https://minecraftcustoms.vercel.app/api/versions/" + plugin.getName().toLowerCase() + "?version=" + version);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(15000);
+            connection.setReadTimeout(15000);
 
             if (connection.getResponseCode() != 200) throw new Exception("failed fetch");
 
@@ -69,15 +67,15 @@ public class Version {
             reader.close();
             connection.disconnect();
 
-            List<String> versions = new Gson().fromJson(stringBuilder.toString(), Plugin.class).versions;
+            int amount = new Gson().fromJson(stringBuilder.toString(), Plugin.class).getOutdatedVersionAmount(currentVersion);
 
-            if (versions.get(0).equals(currentVersion)) {
+            if (amount == 0) {
                 plugin.getLogger().info(plugin.getName() + " plugin is up to date!");
                 return;
 
             }
 
-            plugin.getLogger().info( plugin.getName() + " plugin is outdated, update here: https://minecraftcustoms.vercel.app/download/custom-enchants");
+            plugin.getLogger().info( plugin.getName() + " plugin is outdated by (" + amount + ") versions, update here: https://minecraftcustoms.vercel.app/download/custom-enchants");
 
         } catch (Exception __) {
             plugin.getLogger().warning("Could fetch latest version of " + plugin.getName());
@@ -98,6 +96,20 @@ public class Version {
     private static class Plugin {
 
         List<String> versions;
+
+        public int getOutdatedVersionAmount(@NotNull String current) {
+
+            int i = 0;
+
+            for (String version : versions) {
+                if (version.equals(current)) return i;
+                i++;
+
+            }
+
+            throw new IllegalStateException("Version not matched.");
+
+        }
 
     }
 
