@@ -1,6 +1,8 @@
 package app.vercel.minecraftcustoms.mccenchants.managers;
 
+import app.vercel.minecraftcustoms.mccenchants.Main;
 import app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCInventory;
+import app.vercel.minecraftcustoms.mccenchants.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -11,8 +13,10 @@ import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -25,9 +29,9 @@ public class InventoryManager implements Listener {
 
         plugin.getServer().getPluginManager().registerEvents(new InventoryManager(), plugin);
 
-        registerInventory(new Anvil(plugin), plugin);
+        //registerInventory(new Anvil(plugin), plugin);
         registerInventory(new EnchantingTable(plugin), plugin);
-        registerInventory(new Grindstone(plugin), plugin);
+        //registerInventory(new Grindstone(plugin), plugin);
 
     }
 
@@ -166,5 +170,44 @@ public class InventoryManager implements Listener {
         }
 
     }
+
+    @EventHandler
+    public void onPrepareAnvilEvent(PrepareAnvilEvent event) {
+        if (event.getResult() == null) return;
+        if (event.getResult().getItemMeta() == null) return;
+        if (event.getResult().getEnchantments().isEmpty()) return;
+
+        Utils.convertEnchantsToLore(event.getResult());
+
+    }
+
+    @EventHandler
+    public void onGrindstoneClickEvent(InventoryClickEvent event) {
+
+        if (event.getClickedInventory() == null) return;
+        if (event.getClickedInventory().getType() != InventoryType.GRINDSTONE) return;
+
+        Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
+
+            onPrepareGrindstoneEvent(event.getInventory().getItem(2));
+
+        }, 0);
+
+    }
+
+    // TODO: don't remove all lore just the enchantment lore
+    private void onPrepareGrindstoneEvent(@Nullable ItemStack result) {
+        if (result == null) return;
+        if (result.getItemMeta() == null) return;
+        if (result.getItemMeta().getLore() == null) return;
+
+        ItemMeta meta = result.getItemMeta();
+
+        meta.setLore(null);
+
+        result.setItemMeta(meta);
+
+    }
+
 
 }
