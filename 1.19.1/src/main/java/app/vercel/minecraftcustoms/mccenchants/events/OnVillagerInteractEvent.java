@@ -12,7 +12,7 @@ import org.bukkit.inventory.MerchantRecipe;
 
 public class OnVillagerInteractEvent implements Listener {
 
-    // TODO: we need to check if it's already generated like in chest opening
+    // TODO: we need to check if it's already generated like in chest opening.
 
     @EventHandler
     public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
