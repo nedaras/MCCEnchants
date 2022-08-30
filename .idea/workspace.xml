@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f1115352-8ceb-4427-99c9-0522cfd74517" name="Changes" comment="" />
+    <list default="true" id="f1115352-8ceb-4427-99c9-0522cfd74517" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/lib/MCCAnvil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/lib/MCCGrindstone.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/lib/Mathf.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/managers/Anvil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/managers/Grindstone.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/managers/InventoryManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/managers/InventoryManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/resources/inventories/anvil.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/resources/inventories/grindstone.json" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -18,13 +27,13 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "E:/Plugins/MCCEnchants/1.19.1"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/Plugins/MCCEnchants/1.19.1&quot;
   }
-}]]></component>
+}</component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">

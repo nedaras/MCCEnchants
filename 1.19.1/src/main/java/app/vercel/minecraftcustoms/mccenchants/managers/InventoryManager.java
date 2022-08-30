@@ -29,9 +29,7 @@ public class InventoryManager implements Listener {
 
         plugin.getServer().getPluginManager().registerEvents(new InventoryManager(), plugin);
 
-        //registerInventory(new Anvil(plugin), plugin);
         registerInventory(new EnchantingTable(plugin), plugin);
-        //registerInventory(new Grindstone(plugin), plugin);
 
     }
 
@@ -168,44 +166,6 @@ public class InventoryManager implements Listener {
             }
 
         }
-
-    }
-
-    @EventHandler
-    public void onPrepareAnvilEvent(PrepareAnvilEvent event) {
-        if (event.getResult() == null) return;
-        if (event.getResult().getItemMeta() == null) return;
-        if (event.getResult().getEnchantments().isEmpty()) return;
-
-        Utils.convertEnchantsToLore(event.getResult());
-
-    }
-
-    @EventHandler
-    public void onGrindstoneClickEvent(InventoryClickEvent event) {
-
-        if (event.getClickedInventory() == null) return;
-        if (event.getClickedInventory().getType() != InventoryType.GRINDSTONE) return;
-
-        Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
-
-            onPrepareGrindstoneEvent(event.getInventory().getItem(2));
-
-        }, 0);
-
-    }
-
-    // TODO: don't remove all lore just the enchantment lore
-    private void onPrepareGrindstoneEvent(@Nullable ItemStack result) {
-        if (result == null) return;
-        if (result.getItemMeta() == null) return;
-        if (result.getItemMeta().getLore() == null) return;
-
-        ItemMeta meta = result.getItemMeta();
-
-        meta.setLore(null);
-
-        result.setItemMeta(meta);
 
     }
 
