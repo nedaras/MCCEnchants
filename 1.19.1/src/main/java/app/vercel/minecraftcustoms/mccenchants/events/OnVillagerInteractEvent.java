@@ -27,7 +27,7 @@ public class OnVillagerInteractEvent implements Listener {
             MerchantRecipe recipe = villager.getRecipe(i);
             ItemStack item = recipe.getResult();
 
-            if (MCCEnchanting.getEnchantments(item).isEmpty()) return;
+            if (MCCEnchanting.getEnchantments(item).isEmpty()) continue;
 
             Utils.convertEnchantsToLore(item);
 

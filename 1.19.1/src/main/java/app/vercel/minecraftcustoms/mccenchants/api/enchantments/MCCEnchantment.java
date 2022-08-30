@@ -163,7 +163,7 @@ public abstract class MCCEnchantment {
 
             org.bukkit.enchantments.Enchantment.registerEnchantment(new CraftEnchantment(craftMCCEnchantment.getHandle()));
 
-            Main.getInstance().getLogger().info("Successfully registered enchantment: " + enchantment.getName());
+            Main.getInstance().getLogger().info("Successfully registered enchantment: " + enchantment.getName() + " (" + IRegistry.W.a(craftMCCEnchantment.getHandle()) + ")");
 
             return;
 
@@ -195,7 +195,7 @@ public abstract class MCCEnchantment {
 
             displayNames.put(enchantment.key, ChatColor.translateAlternateColorCodes('&', prefix + enchantment.getDisplayName()));
 
-            Main.getInstance().getLogger().info("Successfully registered enchantment: " + enchantment.getName());
+            Main.getInstance().getLogger().info("Successfully registered enchantment: " + enchantment.getName() + " (" + id + ")");
 
         } catch (NoSuchFieldException | IllegalAccessException error) {
             error.printStackTrace();

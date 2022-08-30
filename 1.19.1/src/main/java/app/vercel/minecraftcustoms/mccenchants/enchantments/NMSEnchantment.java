@@ -78,18 +78,18 @@ public class NMSEnchantment extends Enchantment {
 
     @Override
     public int a(int level) {
-        return enchantment.getMinCost(level);
+        return enchantment.getMaxCost(level);
     }
 
     @Override
     public int b(int level) {
-        return enchantment.getMaxCost(level);
+        return enchantment.getMinCost(level);
     }
 
     @Override
     public boolean a(Enchantment other) {
         CraftMCCEnchantment enchantment = new CraftMCCEnchantment(other);
-        return !enchantment.equals(this.enchantment) && this.enchantment.conflictsWith(enchantment);
+        return !enchantment.equals(this.enchantment) && !this.enchantment.conflictsWith(enchantment);
 
     }
 

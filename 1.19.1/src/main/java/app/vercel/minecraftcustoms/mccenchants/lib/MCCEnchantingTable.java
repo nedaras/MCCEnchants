@@ -3,7 +3,16 @@ package app.vercel.minecraftcustoms.mccenchants.lib;
 import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.utils.MCCEnchantmentInstance;
+import com.google.common.collect.Lists;
+import net.minecraft.SystemUtils;
 import net.minecraft.core.BlockPosition;
+import net.minecraft.core.IRegistry;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.RandomSource;
+import net.minecraft.util.random.WeightedRandom2;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentManager;
 import net.minecraft.world.item.enchantment.WeightedRandomEnchant;
 import net.minecraft.world.level.World;
@@ -20,9 +29,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class MCCEnchantingTable {
 
@@ -53,7 +60,7 @@ public class MCCEnchantingTable {
     public static List<MCCEnchantmentInstance> getEnchantments(@NotNull Random random, int enchantingCost, @NotNull ItemStack item) {
 
         List<MCCEnchantmentInstance> mccEnchantments = new ArrayList<>();
-        List<WeightedRandomEnchant> enchantments = EnchantmentManager.b(new RandomSourceWrapper(random), CraftItemStack.asNMSCopy(item), enchantingCost, false);
+        List<WeightedRandomEnchant> enchantments = b(random, CraftItemStack.asNMSCopy(item), enchantingCost, false);
 
         if (item.getType() == Material.BOOK && enchantments.size() > 1) {
             enchantments.remove(random.nextInt(enchantments.size()));
@@ -104,6 +111,76 @@ public class MCCEnchantingTable {
     public static void updateEnchantingSeed(@NotNull Player player) {
         CraftPlayer craftPlayer = (CraftPlayer) player;
         craftPlayer.getHandle().a(CraftItemStack.asNMSCopy(new ItemStack(Material.AIR)), 0);
+
+    }
+
+    // Fixing canEnchantItem bug
+
+    public static List<WeightedRandomEnchant> b(Random var0, net.minecraft.world.item.ItemStack var1, int var2, boolean var3) {
+        RandomSource randomSource = new RandomSourceWrapper(var0);
+        List<WeightedRandomEnchant> var4 = Lists.newArrayList();
+        Item var5 = var1.c();
+        int var6 = var5.c();
+        if (var6 > 0) {
+            var2 += 1 + var0.nextInt(var6 / 4 + 1) + var0.nextInt(var6 / 4 + 1);
+            float var7 = (var0.nextFloat() + var0.nextFloat() - 1.0F) * 0.15F;
+            var2 = MathHelper.a(Math.round((float) var2 + (float) var2 * var7), 1, Integer.MAX_VALUE);
+            List<WeightedRandomEnchant> var8 = a(var2, var1, var3);
+
+            if (!var8.isEmpty()) {
+                Optional<WeightedRandomEnchant> var10000 = WeightedRandom2.a(randomSource, var8);
+                var10000.ifPresent(var4::add);
+
+                while (var0.nextInt(50) <= var2) {
+                    if (!var4.isEmpty()) {
+                        a(var8, SystemUtils.a(var4));
+                    }
+
+                    if (var8.isEmpty()) {
+                        break;
+                    }
+
+                    var10000 = WeightedRandom2.a(randomSource, var8);
+                    var10000.ifPresent(var4::add);
+                    var2 /= 2;
+                }
+            }
+
+        }
+        return var4;
+    }
+
+    public static List<WeightedRandomEnchant> a(int var0, net.minecraft.world.item.ItemStack var1, boolean var2) {
+        List<WeightedRandomEnchant> var3 = Lists.newArrayList();
+        boolean var5 = var1.a(Items.om);
+        Iterator<Enchantment> var6 = IRegistry.W.iterator();
+
+        while(true) {
+            Enchantment var7;
+            do {
+                do {
+                    do {
+                        if (!var6.hasNext()) {
+                            return var3;
+                        }
+
+                        var7 = var6.next();
+                    } while(var7.b() && !var2);
+                } while(!var7.i());
+            } while(!var7.a(var1) && !var5); // here!
+
+            for(int var8 = var7.a(); var8 > var7.e() - 1; --var8) {
+                if (var0 >= var7.a(var8) && var0 <= var7.b(var8)) {
+                    var3.add(new WeightedRandomEnchant(var7, var8));
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void a(List<WeightedRandomEnchant> var0, WeightedRandomEnchant var1) {
+
+        var0.removeIf(weightedRandomEnchant -> !var1.a.b((weightedRandomEnchant).a));
 
     }
 
