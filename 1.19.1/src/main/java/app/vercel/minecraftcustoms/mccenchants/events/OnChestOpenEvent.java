@@ -1,5 +1,6 @@
 package app.vercel.minecraftcustoms.mccenchants.events;
 
+import app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCEnchanting;
 import app.vercel.minecraftcustoms.mccenchants.utils.Utils;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.world.level.World;
@@ -29,8 +30,6 @@ public class OnChestOpenEvent implements Listener {
         if (event.getClickedBlock().getType() != Material.CHEST) return;
         if (isChestAlreadyGenerated(event.getClickedBlock())) return;
 
-
-
         Chest chest = (Chest) event.getClickedBlock().getState();
         Inventory inventory = chest.getBlockInventory();
 
@@ -39,7 +38,7 @@ public class OnChestOpenEvent implements Listener {
             ItemStack item = inventory.getItem(i);
 
             if (item == null) continue;
-            if (item.getEnchantments().isEmpty()) continue;
+            if (MCCEnchanting.getEnchantments(item).isEmpty()) continue;
 
             Utils.convertEnchantsToLore(item);
 

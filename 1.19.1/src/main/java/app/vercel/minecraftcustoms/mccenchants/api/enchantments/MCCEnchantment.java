@@ -309,13 +309,13 @@ public abstract class MCCEnchantment {
         return byName.values().toArray(new MCCEnchantment[0]);
     }
 
-    public static @NotNull org.bukkit.enchantments.Enchantment toEnchantment(MCCEnchantment enchantment) {
+    public static @NotNull org.bukkit.enchantments.Enchantment toEnchantment(@NotNull MCCEnchantment enchantment) {
         if (!byKey.containsKey(enchantment.key)) throw new IllegalArgumentException("Enchantment not registered: " + enchantment.key);
         return new CraftEnchantment(byKey.get(enchantment.key).getHandle());
 
     }
 
-    public static @NotNull MCCEnchantment toMCCEnchantment(org.bukkit.enchantments.Enchantment enchantment) {
+    public static @NotNull MCCEnchantment toMCCEnchantment(@NotNull org.bukkit.enchantments.Enchantment enchantment) {
         return new CraftMCCEnchantment(CraftEnchantment.getRaw(enchantment));
 
     }
