@@ -3,8 +3,10 @@ package app.vercel.minecraftcustoms.mccenchants.utils;
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCEnchanting;
 import app.vercel.minecraftcustoms.mccenchants.managers.InventoryItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -32,10 +34,10 @@ public class Utils {
 
     public static void convertEnchantsToLore(@NotNull ItemStack item) {
 
-        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        Map<Enchantment, Integer> enchants = MCCEnchanting.getEnchantments(item);
+        if (MCCEnchanting.getEnchantments(item).isEmpty()) return;
 
-        if (enchants.isEmpty()) return;
+        ItemMeta meta = isItemStackSinged(item) ? item.getItemMeta() : signItemStack(item);
+        Map<Enchantment, Integer> enchants = MCCEnchanting.getEnchantments(item);
 
         boolean isEnchantmentBook = item.getType() == Material.ENCHANTED_BOOK;
         List<String> lore = new ArrayList<>();
@@ -66,6 +68,33 @@ public class Utils {
         meta.setLore(lore);
 
         item.setItemMeta(meta);
+
+        System.out.println(isItemStackSinged(item));
+
+    }
+
+    private static ItemMeta signItemStack(@NotNull ItemStack item) {
+
+        net.minecraft.world.item.ItemStack craftItem = CraftItemStack.asNMSCopy(item);
+        NBTTagCompound tag = craftItem.v();
+
+        tag.a("MCCEnchantment", true);
+
+        craftItem.c(tag);
+
+        return CraftItemStack.asBukkitCopy(craftItem).getItemMeta();
+
+    }
+
+    public static boolean isItemStackSinged(@NotNull ItemStack item) {
+
+        net.minecraft.world.item.ItemStack craftItem = CraftItemStack.asNMSCopy(item);
+
+        if (!craftItem.t()) return false;
+
+        NBTTagCompound tag = craftItem.u();
+
+        return tag.e("MCCEnchantment");
 
     }
 

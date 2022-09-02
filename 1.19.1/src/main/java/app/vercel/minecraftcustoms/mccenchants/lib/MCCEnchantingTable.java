@@ -121,19 +121,21 @@ public class MCCEnchantingTable {
         List<WeightedRandomEnchant> var4 = Lists.newArrayList();
         Item var5 = var1.c();
         int var6 = var5.c();
-        if (var6 > 0) {
-            var2 += 1 + var0.nextInt(var6 / 4 + 1) + var0.nextInt(var6 / 4 + 1);
-            float var7 = (var0.nextFloat() + var0.nextFloat() - 1.0F) * 0.15F;
-            var2 = MathHelper.a(Math.round((float) var2 + (float) var2 * var7), 1, Integer.MAX_VALUE);
+        if (var6 <= 0) {
+            return var4;
+        } else {
+            var2 += 1 + randomSource.a(var6 / 4 + 1) + randomSource.a(var6 / 4 + 1);
+            float var7 = (randomSource.i() + randomSource.i() - 1.0F) * 0.15F;
+            var2 = MathHelper.a(Math.round((float)var2 + (float)var2 * var7), 1, Integer.MAX_VALUE);
             List<WeightedRandomEnchant> var8 = a(var2, var1, var3);
-
             if (!var8.isEmpty()) {
                 Optional<WeightedRandomEnchant> var10000 = WeightedRandom2.a(randomSource, var8);
+                Objects.requireNonNull(var4);
                 var10000.ifPresent(var4::add);
 
-                while (var0.nextInt(50) <= var2) {
+                while(randomSource.a(50) <= var2) {
                     if (!var4.isEmpty()) {
-                        a(var8, SystemUtils.a(var4));
+                        EnchantmentManager.a(var8, SystemUtils.a(var4));
                     }
 
                     if (var8.isEmpty()) {
@@ -141,18 +143,19 @@ public class MCCEnchantingTable {
                     }
 
                     var10000 = WeightedRandom2.a(randomSource, var8);
+                    Objects.requireNonNull(var4);
                     var10000.ifPresent(var4::add);
                     var2 /= 2;
                 }
             }
 
+            return var4;
         }
-        return var4;
     }
 
     public static List<WeightedRandomEnchant> a(int var0, net.minecraft.world.item.ItemStack var1, boolean var2) {
         List<WeightedRandomEnchant> var3 = Lists.newArrayList();
-        boolean var5 = var1.a(Items.om);
+        boolean var5 = var1.a(Items.oY);
         Iterator<Enchantment> var6 = IRegistry.W.iterator();
 
         while(true) {
@@ -167,7 +170,7 @@ public class MCCEnchantingTable {
                         var7 = var6.next();
                     } while(var7.b() && !var2);
                 } while(!var7.i());
-            } while(!var7.a(var1) && !var5); // here!
+            } while(!var7.a(var1) && !var5); // here
 
             for(int var8 = var7.a(); var8 > var7.e() - 1; --var8) {
                 if (var0 >= var7.a(var8) && var0 <= var7.b(var8)) {
@@ -176,12 +179,6 @@ public class MCCEnchantingTable {
                 }
             }
         }
-    }
-
-    public static void a(List<WeightedRandomEnchant> var0, WeightedRandomEnchant var1) {
-
-        var0.removeIf(weightedRandomEnchant -> !var1.a.b((weightedRandomEnchant).a));
-
     }
 
 }

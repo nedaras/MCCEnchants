@@ -24,18 +24,11 @@ public class OnPrepareGrindstoneEvent implements Listener {
 
     }
 
-    // TODO: don't remove all lore just the enchantment lore
     private void onPrepareGrindstoneEvent(@Nullable ItemStack result) {
 
         if (result == null) return;
         if (result.getItemMeta() == null) return;
         if (!result.getItemMeta().hasLore()) return;
-
-        ItemMeta meta = result.getItemMeta();
-
-        meta.setLore(null);
-
-        result.setItemMeta(meta);
 
         Utils.convertEnchantsToLore(result);
 

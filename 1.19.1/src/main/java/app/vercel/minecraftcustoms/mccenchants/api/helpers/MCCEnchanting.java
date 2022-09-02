@@ -1,14 +1,11 @@
 package app.vercel.minecraftcustoms.mccenchants.api.helpers;
 
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
-import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -16,85 +13,55 @@ import java.util.Objects;
 
 public class MCCEnchanting {
 
-    public static void setEnchantment(@NotNull ItemStack target, @NotNull Enchantment enchantment, int level) {
-        setEnchantment(target, MCCEnchantment.toMCCEnchantment(enchantment), level);
+    public static void setEnchantment(@NotNull ItemStack target, @NotNull MCCEnchantment enchantment, int level) {
+        setEnchantment(target, MCCEnchantment.toEnchantment(enchantment), level);
 
     }
 
-    public static void setEnchantment(@NotNull ItemStack target, @NotNull MCCEnchantment enchantment, int level) {
+    public static void setEnchantment(@NotNull ItemStack target, @NotNull Enchantment enchantment, int level) {
 
         boolean isEnchantingBook = target.getType() == Material.ENCHANTED_BOOK;
-        Enchantment craftEnchantment = MCCEnchantment.toEnchantment(enchantment);
-
-        Map<Enchantment, Integer> enchantments = getEnchantments(target);
-        Utils.convertEnchantsToLore(target);
-
-        if (enchantments.containsKey(craftEnchantment)) {
-
-            if (isEnchantingBook) {
-
-                EnchantmentStorageMeta meta = (EnchantmentStorageMeta) Objects.requireNonNull(target.getItemMeta());
-
-                meta.removeStoredEnchant(craftEnchantment);
-                target.setItemMeta(meta);
-
-            }
-            else target.removeEnchantment(craftEnchantment);
-
-            Utils.removeEnchantmentLore(target, enchantment, enchantments.get(craftEnchantment));
-
-        }
 
         if (isEnchantingBook) {
 
-            EnchantmentStorageMeta meta = (EnchantmentStorageMeta) Objects.requireNonNull(target.getItemMeta());
-
-            meta.addStoredEnchant(craftEnchantment, level, false);
-            meta.addItemFlags(ItemFlag.values());
+            EnchantmentStorageMeta meta = (EnchantmentStorageMeta) target.getItemMeta();
+            meta.addStoredEnchant(enchantment, level, false);
 
             target.setItemMeta(meta);
-
-            Utils.addEnchantmentLore(target, enchantment, level);
+            Utils.convertEnchantsToLore(target);
 
             return;
 
         }
 
-        target.addEnchantment(craftEnchantment, level);
-        ItemMeta meta = Objects.requireNonNull(target.getItemMeta());
-
-        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-
-        target.setItemMeta(meta);
-
-        Utils.addEnchantmentLore(target, enchantment, level);
+        target.addEnchantment(enchantment, level);
+        Utils.convertEnchantsToLore(target);
 
     }
 
     public static void removeEnchantment(@NotNull ItemStack target, @NotNull Enchantment enchantment) {
-        removeEnchantment(target, MCCEnchantment.toMCCEnchantment(enchantment));
+
+        boolean isEnchantingBook = target.getType() == Material.ENCHANTED_BOOK;
+
+        if (isEnchantingBook) {
+
+            EnchantmentStorageMeta meta = (EnchantmentStorageMeta) target.getItemMeta();
+            meta.removeStoredEnchant(enchantment);
+
+            target.setItemMeta(meta);
+            Utils.convertEnchantsToLore(target);
+
+            return;
+
+        }
+
+        target.removeEnchantment(enchantment);
+        Utils.convertEnchantsToLore(target);
 
     }
 
     public static void removeEnchantment(@NotNull ItemStack target, @NotNull MCCEnchantment enchantment) {
-
-        boolean isEnchantingBook = target.getType() == Material.ENCHANTED_BOOK;
-        Enchantment craftEnchantment = CraftMCCEnchantment.toEnchantment(enchantment);
-
-        Map<Enchantment, Integer> enchantments = getEnchantments(target);
-        Utils.convertEnchantsToLore(target);
-
-        if (isEnchantingBook) {
-
-            EnchantmentStorageMeta meta = (EnchantmentStorageMeta) Objects.requireNonNull(target.getItemMeta());
-
-            meta.removeStoredEnchant(craftEnchantment);
-            target.setItemMeta(meta);
-
-        }
-        else target.removeEnchantment(craftEnchantment);
-
-        Utils.removeEnchantmentLore(target, enchantment, enchantments.get(craftEnchantment));
+        removeEnchantment(target, MCCEnchantment.toEnchantment(enchantment));
 
     }
 

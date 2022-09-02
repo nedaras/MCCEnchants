@@ -31,6 +31,8 @@ public final class EnchantingTable extends CorrespondingInventory {
 
     }
 
+    // We need lapis lazuli
+
     public EnchantingTable(@NotNull JavaPlugin plugin) {
         super(plugin, states, Material.ENCHANTING_TABLE);
         if (this.getCheckupSlots().size() >= 1) inputSlot = this.getCheckupSlots().get(0);

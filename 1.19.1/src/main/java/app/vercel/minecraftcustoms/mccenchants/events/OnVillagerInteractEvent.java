@@ -12,8 +12,6 @@ import org.bukkit.inventory.MerchantRecipe;
 
 public class OnVillagerInteractEvent implements Listener {
 
-    // TODO: we need to check if it's already generated like in chest opening.
-
     @EventHandler
     public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
 
@@ -28,6 +26,7 @@ public class OnVillagerInteractEvent implements Listener {
             ItemStack item = recipe.getResult();
 
             if (MCCEnchanting.getEnchantments(item).isEmpty()) continue;
+            if (Utils.isItemStackSinged(item)) continue;
 
             Utils.convertEnchantsToLore(item);
 
