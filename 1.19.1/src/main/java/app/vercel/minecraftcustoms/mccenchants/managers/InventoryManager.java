@@ -108,6 +108,7 @@ public class InventoryManager implements Listener {
         }
         if (event.getClickedInventory() == null) return;
 
+        // TODO: it can shift tab anf grab multiple stack >:(
         boolean isPlayersInventory = event.getClickedInventory().getType() == InventoryType.PLAYER;
         Inventory oppositeInventory = isPlayersInventory ? event.getView().getTopInventory() : event.getView().getBottomInventory();
         ItemStack item = event.getClickedInventory().getItem(event.getSlot());
@@ -115,9 +116,29 @@ public class InventoryManager implements Listener {
         if (item != null && item.getType() == Material.AIR) item = null;
 
         InventoryAction action = isPlayersInventory ? InventoryAction.PLACE_ALL : InventoryAction.PICKUP_ALL;
-        int slot = action == InventoryAction.PLACE_ALL ? oppositeInventory.firstEmpty() : event.getSlot();
+        int slot = action == InventoryAction.PLACE_ALL ? finValidSlot(oppositeInventory, item) : event.getSlot();
         InventoryClickEvent _event = new InventoryClickEvent(event.getView(), event.getSlotType(), slot, event.getClick(), action);
         inventory.onInventoryClickEvent(_event, item);
+
+    }
+
+    private int finValidSlot(@NotNull Inventory inventory, @Nullable ItemStack item) {
+
+        if (item == null) return inventory.firstEmpty();
+
+        for (int i = 0; i < inventory.getSize(); i++) {
+
+            ItemStack inventoryItem = inventory.getItem(i);
+
+            if (inventoryItem == null) continue;
+            if (!inventoryItem.isSimilar(item)) continue;
+            if (inventoryItem.getAmount() >= inventoryItem.getMaxStackSize()) continue;
+
+            return i;
+
+        }
+
+        return inventory.firstEmpty();
 
     }
 

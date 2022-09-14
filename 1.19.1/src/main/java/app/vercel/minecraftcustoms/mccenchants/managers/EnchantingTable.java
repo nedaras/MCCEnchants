@@ -33,7 +33,7 @@ public final class EnchantingTable extends CorrespondingInventory {
 
     }
 
-    // We need lapis lazuli
+    // TODO: refactor code there are a lot of functions repeating it self
 
     public EnchantingTable(@NotNull JavaPlugin plugin) {
         super(plugin, states, Material.ENCHANTING_TABLE);
@@ -207,7 +207,9 @@ public final class EnchantingTable extends CorrespondingInventory {
             }
 
             int bookshelves = getBookshelves(player);
+
             int placedLapisAmount = event.getInventory().getItem(lapisLazuliSlot) != null && event.getInventory().getItem(lapisLazuliSlot).getType() == Material.LAPIS_LAZULI ? event.getInventory().getItem(lapisLazuliSlot).getAmount() : 0;
+            int amount = event.getAction() == InventoryAction.PLACE_ONE ? placedLapisAmount + 1 : item.getAmount() + placedLapisAmount;
 
             for (int enchantingSlot = 1; enchantingSlot <= 3; enchantingSlot++) {
 
@@ -231,7 +233,7 @@ public final class EnchantingTable extends CorrespondingInventory {
 
                 if (player.getGameMode() != GameMode.CREATIVE) {
 
-                    if (item.getType() != Material.LAPIS_LAZULI || item.getAmount() + placedLapisAmount < enchantingSlot) {
+                    if (item.getType() != Material.LAPIS_LAZULI || amount < enchantingSlot) {
 
                         inventoryItem = this.getSavedItemsWithFunction("missing_lapis_lazuli", "enchant_" + enchantingSlot);
                         if (inventoryItem == null) continue;
