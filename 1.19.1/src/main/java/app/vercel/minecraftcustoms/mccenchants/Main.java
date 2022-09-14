@@ -28,8 +28,7 @@ public final class Main extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new OnPrepareGrindstoneEvent(), this);
         this.getServer().getPluginManager().registerEvents(new OnChestOpenEvent(), this);
         this.getServer().getPluginManager().registerEvents(new OnVillagerInteractEvent(), this);
-        this.getServer().getPluginManager().registerEvents(new OnPlayerFishEvent(), this);
-        this.getServer().getPluginManager().registerEvents(new OnEntityDeathEvent(), this);
+        this.getServer().getPluginManager().registerEvents(new OnPlayerPickupItemEvent(), this);
 
     }
 

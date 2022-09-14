@@ -21,8 +21,11 @@ public class Utils {
 
     public static ItemStack hiddenItemStackName(Material material) {
 
+
         ItemStack item = new ItemStack(material);
-        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
+        if (!item.hasItemMeta()) return item;
+
+        ItemMeta meta = item.getItemMeta();
 
         meta.setDisplayName(ChatColor.RESET + "");
 
@@ -69,8 +72,6 @@ public class Utils {
 
         item.setItemMeta(meta);
 
-        System.out.println(isItemStackSinged(item));
-
     }
 
     private static ItemMeta signItemStack(@NotNull ItemStack item) {
@@ -86,6 +87,22 @@ public class Utils {
 
     }
 
+    public static boolean isUpToDate(@NotNull ItemStack item) {
+
+        if (!isItemStackSinged(item)) return false;
+        if (!item.getItemMeta().hasLore()) return false;
+
+        for (Map.Entry<Enchantment, Integer> entry : MCCEnchanting.getEnchantments(item).entrySet()) {
+            MCCEnchantment enchantment = MCCEnchantment.toMCCEnchantment(entry.getKey());
+
+            if (!item.getItemMeta().getLore().contains(enchantment.getDisplayName(entry.getValue()))) return false;
+
+        }
+
+        return true;
+
+    }
+
     public static boolean isItemStackSinged(@NotNull ItemStack item) {
 
         net.minecraft.world.item.ItemStack craftItem = CraftItemStack.asNMSCopy(item);
@@ -95,36 +112,6 @@ public class Utils {
         NBTTagCompound tag = craftItem.u();
 
         return tag.e("MCCEnchantment");
-
-    }
-
-    public static void addEnchantmentLore(@NotNull ItemStack item, @NotNull MCCEnchantment enchantment, int level) {
-        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-
-        List<String> lore = meta.hasLore() ? Objects.requireNonNull(meta.getLore()) : new ArrayList<>();
-
-        lore.add(MCCEnchanting.getEnchantments(item).size() - 1, enchantment.getDisplayName(level));
-
-        meta.setLore(lore);
-
-        item.setItemMeta(meta);
-
-    }
-
-    public static void removeEnchantmentLore(@NotNull ItemStack item, @NotNull MCCEnchantment enchantment, int level) {
-
-        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-
-        if (!meta.hasLore()) return;
-
-        List<String> lore = Objects.requireNonNull(meta.getLore());
-
-        if (!lore.contains(enchantment.getDisplayName(level))) return;
-
-        lore.remove(enchantment.getDisplayName(level));
-        meta.setLore(lore);
-
-        item.setItemMeta(meta);
 
     }
 
@@ -145,15 +132,6 @@ public class Utils {
             default: return number + "";
 
         }
-
-    }
-
-    public static List<String> translateAlternateColorCodes(char altColorChar, List<String> list) {
-
-        List<String> stringList = new ArrayList<>();
-        list.forEach((string) -> stringList.add(ChatColor.translateAlternateColorCodes(altColorChar, string)));
-
-        return stringList;
 
     }
 

@@ -53,14 +53,12 @@ public abstract class CorrespondingInventory implements Listener {
 
         for (int i = 0; i < inventory.getSize(); i++) {
 
-            if (items[i] == null) {
-                inventory.setItem(i, null);
-                checkupSlots.add(i);
-                continue;
+            String material = items[i].split(" ").length > 1 ? items[i].split(" ")[0] : items[i];
+
+            if (InventoryManagerUtils.fixeName(items[i]) == null && Utils.containsMaterial(material)) {
+                inventory.setItem(i, Utils.hiddenItemStackName(Material.matchMaterial(material)));
 
             }
-
-            if (InventoryManagerUtils.fixeName(items[i]) == null && Utils.containsMaterial(items[i])) inventory.setItem(i, Utils.hiddenItemStackName(Objects.requireNonNull(Material.matchMaterial(items[i]))));
             else {
 
                 ItemStack item = InventoryManagerUtils.itemStackFromConfig(plugin, config, "custom_items." + InventoryManagerUtils.fixeName(items[i]));
@@ -69,11 +67,11 @@ public abstract class CorrespondingInventory implements Listener {
                 inventory.setItem(i, item);
                 inventoryItems.add(new InventoryItemStack(item, InventoryManagerUtils.getFunction(items[i]), i, amount));
 
-
             }
 
-            saveStates(config, items[i], i);
             String function = InventoryManagerUtils.getFunction(items[i]);
+
+            saveStates(config, items[i], i);
 
             if (Objects.equals(function, "close")) closeSlot = i;
             else if (function != null) registerFunction(function, i);

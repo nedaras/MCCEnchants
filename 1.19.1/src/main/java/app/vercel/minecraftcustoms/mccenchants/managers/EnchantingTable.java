@@ -21,13 +21,15 @@ public final class EnchantingTable extends CorrespondingInventory {
 
     private static final @NotNull Map<UUID, Integer> storedBookshelves = new HashMap<>();
     private static final @NotNull Map<UUID, Map<Integer, Integer>> storedEnchantableSlots = new HashMap<>();
-    private int inputSlot = -1;
+    private static int inputSlot = -1;
+    private static int lapisLazuliSlot = -1;
 
     static {
 
         states.add("enchant_item");
         states.add("missing_levels");
         states.add("unenchantable_item");
+        states.add("missing_lapis_lazuli");
 
     }
 
@@ -35,7 +37,24 @@ public final class EnchantingTable extends CorrespondingInventory {
 
     public EnchantingTable(@NotNull JavaPlugin plugin) {
         super(plugin, states, Material.ENCHANTING_TABLE);
-        if (this.getCheckupSlots().size() >= 1) inputSlot = this.getCheckupSlots().get(0);
+
+    }
+
+    @Override
+    public void registerFunction(@NotNull String function, int slot) {
+
+        if (function.equals("input")) {
+
+            inputSlot = slot;
+            this.getCheckupSlots().add(inputSlot);
+
+        }
+        if (function.equals("lapis_lazuli")) {
+
+            lapisLazuliSlot = slot;
+            this.getCheckupSlots().add(lapisLazuliSlot);
+
+        }
 
     }
 
@@ -56,17 +75,20 @@ public final class EnchantingTable extends CorrespondingInventory {
     @Override
     public void onInventoryClickEvent(InventoryClickEvent event, ItemStack item) {
 
+        // TODO: we need shift click checks
+
         if (event.getClickedInventory() == null) return;
         if (event.getClickedInventory().getType() == InventoryType.PLAYER) return;
         if (item == null) return;
 
         Player player = (Player) event.getWhoClicked();
 
-        event.setCancelled(event.getSlot() != inputSlot);
+        event.setCancelled(!this.getCheckupSlots().contains(event.getSlot()));
 
         if (event.getSlot() == inputSlot) {
 
             if (isPickup(event)) {
+
                 storedEnchantableSlots.put(player.getUniqueId(), new HashMap<>());
                 this.clearState(event);
 
@@ -77,6 +99,9 @@ public final class EnchantingTable extends CorrespondingInventory {
             if (MCCEnchantingTable.canEnchantItem(item)) {
 
                 int bookshelves = getBookshelves(player);
+
+                ItemStack lapisLazuli = event.getInventory().getItem(lapisLazuliSlot);
+                boolean isLapisLazuli = lapisLazuli != null && lapisLazuli.getType() == Material.LAPIS_LAZULI;
 
                 for (int enchantingSlot = 1; enchantingSlot <= 3; enchantingSlot++) {
 
@@ -107,6 +132,21 @@ public final class EnchantingTable extends CorrespondingInventory {
 
                     }
 
+                    if (player.getGameMode() != GameMode.CREATIVE && lapisLazuliSlot > 1) {
+
+                        if (!isLapisLazuli || lapisLazuli.getAmount() < enchantingSlot) {
+
+                            inventoryItem = this.getSavedItemsWithFunction("missing_lapis_lazuli", "enchant_" + enchantingSlot);
+                            if (inventoryItem == null) continue;
+
+                            event.getInventory().setItem(inventoryItem.getSlot(), Utils.setPlaceholders(inventoryItem, placeholders));
+
+                            continue;
+
+                        }
+
+                    }
+
                     Map<Integer, Integer> enchantableSlots = storedEnchantableSlots.get(player.getUniqueId());
                     enchantableSlots.put(inventoryItem.getSlot(), enchantingSlot);
 
@@ -125,6 +165,98 @@ public final class EnchantingTable extends CorrespondingInventory {
 
         }
 
+        if (event.getSlot() == lapisLazuliSlot) {
+
+            ItemStack itemToEnchant = event.getInventory().getItem(inputSlot);
+
+            if (itemToEnchant == null || !MCCEnchantingTable.canEnchantItem(itemToEnchant)) return;
+
+            if (isPickup(event)) {
+
+                int bookshelves = getBookshelves(player);
+
+                for (int enchantingSlot = 1; enchantingSlot <= 3; enchantingSlot++) {
+
+                    Random random = new Random(MCCEnchantingTable.getEnchantingSeed(player) + (enchantingSlot - 1));
+
+                    int cost = MCCEnchantingTable.getEnchantingCost(random, enchantingSlot, bookshelves, itemToEnchant);
+                    if (cost < enchantingSlot) continue;
+
+                    if (player.getGameMode() != GameMode.CREATIVE && player.getLevel() < cost) return;
+
+                    MCCEnchantmentInstance enchantment = getFirstEnchant(random, itemToEnchant, cost);
+                    if (enchantment == null) continue;
+
+                    InventoryItemStack inventoryItem = this.getSavedItemsWithFunction("enchant_item", "enchant_" + enchantingSlot);
+                    if (inventoryItem == null) continue;
+
+                    Map<String, String> placeholders = new HashMap<>();
+
+                    placeholders.put("level", cost + "");
+                    placeholders.put("enchantment", enchantment.getEnchantment().getDisplayName(enchantment.getLevel()));
+
+                    inventoryItem = this.getSavedItemsWithFunction("missing_lapis_lazuli", "enchant_" + enchantingSlot);
+                    if (inventoryItem == null) continue;
+
+                    event.getInventory().setItem(inventoryItem.getSlot(), Utils.setPlaceholders(inventoryItem, placeholders));
+
+                }
+
+                return;
+
+            }
+
+            int bookshelves = getBookshelves(player);
+            int placedLapisAmount = event.getInventory().getItem(lapisLazuliSlot) != null && event.getInventory().getItem(lapisLazuliSlot).getType() == Material.LAPIS_LAZULI ? event.getInventory().getItem(lapisLazuliSlot).getAmount() : 0;
+
+            for (int enchantingSlot = 1; enchantingSlot <= 3; enchantingSlot++) {
+
+                Random random = new Random(MCCEnchantingTable.getEnchantingSeed(player) + (enchantingSlot - 1));
+
+                int cost = MCCEnchantingTable.getEnchantingCost(random, enchantingSlot, bookshelves, itemToEnchant);
+                if (cost < enchantingSlot) continue;
+
+                if (player.getGameMode() != GameMode.CREATIVE && player.getLevel() < cost) return;
+
+                MCCEnchantmentInstance enchantment = getFirstEnchant(random, itemToEnchant, cost);
+                if (enchantment == null) continue;
+
+                InventoryItemStack inventoryItem = this.getSavedItemsWithFunction("enchant_item", "enchant_" + enchantingSlot);
+                if (inventoryItem == null) continue;
+
+                Map<String, String> placeholders = new HashMap<>();
+
+                placeholders.put("level", cost + "");
+                placeholders.put("enchantment", enchantment.getEnchantment().getDisplayName(enchantment.getLevel()));
+
+                if (player.getGameMode() != GameMode.CREATIVE) {
+
+                    if (item.getType() != Material.LAPIS_LAZULI || item.getAmount() + placedLapisAmount < enchantingSlot) {
+
+                        inventoryItem = this.getSavedItemsWithFunction("missing_lapis_lazuli", "enchant_" + enchantingSlot);
+                        if (inventoryItem == null) continue;
+
+                        event.getInventory().setItem(inventoryItem.getSlot(), Utils.setPlaceholders(inventoryItem, placeholders));
+
+                        continue;
+
+                    }
+
+                }
+
+                Map<Integer, Integer> enchantableSlots = storedEnchantableSlots.get(player.getUniqueId());
+                enchantableSlots.put(inventoryItem.getSlot(), enchantingSlot);
+
+                storedEnchantableSlots.put(player.getUniqueId(), enchantableSlots);
+
+                event.getInventory().setItem(inventoryItem.getSlot(), Utils.setPlaceholders(inventoryItem, placeholders));
+
+            }
+
+            return;
+
+        }
+
         Map<Integer, Integer> enchantableSlots = storedEnchantableSlots.get(player.getUniqueId());
         ItemStack itemStack = event.getInventory().getItem(inputSlot);
 
@@ -139,10 +271,19 @@ public final class EnchantingTable extends CorrespondingInventory {
         Random random = new Random(MCCEnchantingTable.getEnchantingSeed(player) + (enchantingSlot - 1));
 
         int cost = MCCEnchantingTable.getEnchantingCost(random, enchantingSlot, bookshelves, itemStack);
-        ItemStack enchantedItem = Objects.requireNonNull(MCCEnchantingTable.enchantItem(random, cost, itemStack));
+        ItemStack enchantedItem = MCCEnchantingTable.enchantItem(random, cost, itemStack);
 
         if (player.getGameMode() != GameMode.CREATIVE) player.setLevel(player.getLevel() - enchantingSlot);
-        event.getInventory().setItem(inputSlot, new ItemStack(Material.AIR));
+        event.getInventory().setItem(inputSlot, null);
+
+        if (lapisLazuliSlot > 1) {
+
+            ItemStack lapis = event.getInventory().getItem(lapisLazuliSlot);
+
+            if (lapis.getAmount() == enchantingSlot) event.getInventory().setItem(lapisLazuliSlot, null);
+            else lapis.setAmount(lapis.getAmount() - enchantingSlot);
+
+        }
 
         MCCInventory.saveAddItemToInventory(player, enchantedItem);
         player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1f, 1f);

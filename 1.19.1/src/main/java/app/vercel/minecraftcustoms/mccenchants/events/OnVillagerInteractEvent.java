@@ -23,6 +23,7 @@ public class OnVillagerInteractEvent implements Listener {
         for (int i = 0; i < villager.getRecipes().size(); i++) {
 
             MerchantRecipe recipe = villager.getRecipe(i);
+
             ItemStack item = recipe.getResult();
 
             if (MCCEnchanting.getEnchantments(item).isEmpty()) continue;
