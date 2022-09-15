@@ -77,6 +77,7 @@ public class InventoryManager implements Listener {
 
         CorrespondingInventory inventory = playerInventories.get(event.getInventory().hashCode());
         if (event.getSlot() == inventory.getCloseSlot()) {
+
             event.setCancelled(true);
 
             // Running later so, it would prevent from spawning ghost item in players inventory.
@@ -85,60 +86,30 @@ public class InventoryManager implements Listener {
             return;
 
         }
-
-        event.setCancelled(event.getClickedInventory().getType() != InventoryType.PLAYER);
-
-        for (int checkupSlot : inventory.getCheckupSlots()) {
-            if (event.getSlot() == checkupSlot) {
-                event.setCancelled(false);
-                break;
-            }
-
-        }
-
-        if (event.getAction() != InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-
-            ItemStack item = event.getCursor();
-            if (inventory.isPickup(event)) item = event.getInventory().getItem(event.getSlot());
-            if (item != null && item.getType() == Material.AIR) item = null;
-
-            inventory.onInventoryClickEvent(event, item);
-            return;
-
-        }
-        if (event.getClickedInventory() == null) return;
-
-        // TODO: it can shift tab anf grab multiple stack >:(
-        boolean isPlayersInventory = event.getClickedInventory().getType() == InventoryType.PLAYER;
-        Inventory oppositeInventory = isPlayersInventory ? event.getView().getTopInventory() : event.getView().getBottomInventory();
-        ItemStack item = event.getClickedInventory().getItem(event.getSlot());
-
-        if (item != null && item.getType() == Material.AIR) item = null;
-
-        InventoryAction action = isPlayersInventory ? InventoryAction.PLACE_ALL : InventoryAction.PICKUP_ALL;
-        int slot = action == InventoryAction.PLACE_ALL ? finValidSlot(oppositeInventory, item) : event.getSlot();
-        InventoryClickEvent _event = new InventoryClickEvent(event.getView(), event.getSlotType(), slot, event.getClick(), action);
-        inventory.onInventoryClickEvent(_event, item);
+        // we can shift click glass
+        // we need to fix MOVE_TO_ANOTHER_INVENTORY state
+        event.setCancelled(event.getClickedInventory().getType() == InventoryType.CHEST && !inventory.getCheckupSlots().contains(getValidSlot(event)));
+        Bukkit.getScheduler().runTaskLater(inventory.getPlugin(), () -> inventory.onInventoryClickEvent(event), 0);
 
     }
 
-    private int finValidSlot(@NotNull Inventory inventory, @Nullable ItemStack item) {
+    private int getValidSlot(InventoryClickEvent event) {
 
-        if (item == null) return inventory.firstEmpty();
+        if (!event.isShiftClick() || event.getClickedInventory().getType() == InventoryType.CHEST) return event.getSlot();
 
-        for (int i = 0; i < inventory.getSize(); i++) {
+        for (int i = 0; i < event.getInventory().getSize(); i++) {
 
-            ItemStack inventoryItem = inventory.getItem(i);
+            ItemStack inventoryItem = event.getInventory().getItem(i);
 
             if (inventoryItem == null) continue;
-            if (!inventoryItem.isSimilar(item)) continue;
+            if (!inventoryItem.isSimilar(event.getCurrentItem())) continue;
             if (inventoryItem.getAmount() >= inventoryItem.getMaxStackSize()) continue;
 
             return i;
 
         }
 
-        return inventory.firstEmpty();
+        return event.getInventory().firstEmpty() != -1 ? event.getInventory().firstEmpty() : event.getSlot();
 
     }
 
@@ -168,27 +139,6 @@ public class InventoryManager implements Listener {
 
     }
 
-    @EventHandler
-    public void onInventoryMoveItemEven(InventoryMoveItemEvent event) {
-
-        if (event.getDestination().getType() != InventoryType.PLAYER && isCustomInventory(event.getDestination())) event.setCancelled(true);
-
-    }
-
-    @EventHandler
-    public void onInventoryDragEvent(InventoryDragEvent event) {
-
-        if (!isCustomInventory(event.getInventory())) return;
-
-        for (Integer slot : event.getRawSlots()) {
-            if (slot <= event.getInventory().getSize()) {
-                event.setCancelled(true);
-                break;
-            }
-
-        }
-
-    }
-
+    // we need to convert drag event to click event
 
 }

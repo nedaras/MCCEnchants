@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -143,7 +144,7 @@ public abstract class CorrespondingInventory implements Listener {
 
     }
 
-    public abstract void onInventoryClickEvent(InventoryClickEvent event, ItemStack item);
+    public abstract void onInventoryClickEvent(InventoryClickEvent event);
 
     public @NotNull Material getCorrespondingBlock() {
         return correspondingBlock;
@@ -173,6 +174,11 @@ public abstract class CorrespondingInventory implements Listener {
     public void setState(@NotNull InventoryClickEvent event, @NotNull String state) {
         if (!state.equals("default") && getState(event) != null) updateStatedItemStacks(event, "default");
         updateStatedItemStacks(event, state);
+        playerInventoryStates.get(event.getWhoClicked().getUniqueId()).setState(state);
+
+    }
+
+    public void setSoftState(@NotNull InventoryClickEvent event, @NotNull String state) {
         playerInventoryStates.get(event.getWhoClicked().getUniqueId()).setState(state);
 
     }
@@ -232,13 +238,14 @@ public abstract class CorrespondingInventory implements Listener {
 
     public boolean isPickup(InventoryClickEvent event) {
         InventoryAction inventoryAction = event.getAction();
+        // TODO: check if it can be dhifted down
+        if (event.getClickedInventory().getType() == InventoryType.CHEST && event.isShiftClick()) return true;
         return inventoryAction == InventoryAction.PICKUP_ALL || inventoryAction == InventoryAction.PICKUP_HALF || inventoryAction == InventoryAction.PICKUP_ONE || inventoryAction == InventoryAction.PICKUP_SOME;
 
     }
 
     public boolean isPlace(InventoryClickEvent event) {
-        InventoryAction inventoryAction = event.getAction();
-        return inventoryAction == InventoryAction.PLACE_ALL || inventoryAction == InventoryAction.PLACE_ONE || inventoryAction == InventoryAction.PLACE_SOME || inventoryAction == InventoryAction.SWAP_WITH_CURSOR;
+        return !isPickup(event);
 
     }
 
