@@ -86,8 +86,8 @@ public class InventoryManager implements Listener {
             return;
 
         }
-        // we can shift click glass
-        // we need to fix MOVE_TO_ANOTHER_INVENTORY state
+        // TODO: we can shift click glass
+        // TODO: we need to fix MOVE_TO_ANOTHER_INVENTORY state
         event.setCancelled(event.getClickedInventory().getType() == InventoryType.CHEST && !inventory.getCheckupSlots().contains(getValidSlot(event)));
         Bukkit.getScheduler().runTaskLater(inventory.getPlugin(), () -> inventory.onInventoryClickEvent(event), 0);
 
@@ -139,6 +139,34 @@ public class InventoryManager implements Listener {
 
     }
 
-    // we need to convert drag event to click event
+    @EventHandler
+    public void onInventoryDragEvent(InventoryDragEvent event) {
+
+        if (!isCustomInventory(event.getInventory())) return;
+
+        List<Integer> validSlots = new ArrayList<>();
+        int size = event.getView().getTopInventory().getSize();
+
+        event.getRawSlots().forEach(slot -> {
+
+            if (slot >= size) return;
+
+            validSlots.add(slot);
+
+        });
+
+        if (validSlots.isEmpty()) return;
+
+        InventoryClickEvent clickEvent = new InventoryClickEvent(
+          event.getView(),
+          InventoryType.SlotType.CONTAINER,
+          validSlots.get(validSlots.size() - 1),
+          ClickType.LEFT,
+          InventoryAction.PLACE_SOME
+        );
+
+        onInventoryClickEvent(clickEvent);
+
+    }
 
 }

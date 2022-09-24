@@ -178,35 +178,8 @@ public abstract class CorrespondingInventory implements Listener {
 
     }
 
-    public void setSoftState(@NotNull InventoryClickEvent event, @NotNull String state) {
-        playerInventoryStates.get(event.getWhoClicked().getUniqueId()).setState(state);
-
-    }
-
-    public void setState(@NotNull InventoryClickEvent event, @NotNull String state, Map<String, String> placeholders) {
-        if (!state.equals("default") && getState(event) != null) updateStatedItemStacks(event, "default");
-        updateStatedItemStacks(event, state, placeholders);
-        playerInventoryStates.get(event.getWhoClicked().getUniqueId()).setState(state);
-
-    }
-
     public void clearState(@NotNull InventoryClickEvent event) {
         setState(event, "default");
-
-    }
-
-    public void setIndividualState(@NotNull InventoryClickEvent event, @NotNull String state) {
-        updateStatedItemStacks(event, state);
-
-    }
-
-    public void clearIndividualState(@NotNull InventoryClickEvent event, @NotNull String state) {
-        if (!savedItems.containsKey(state)) return;
-
-        for (InventoryItemStack item : savedItems.get(state)) {
-            event.getInventory().setItem(item.getSlot(), inventory.getItem(item.getSlot()));
-
-        }
 
     }
 
@@ -238,7 +211,7 @@ public abstract class CorrespondingInventory implements Listener {
 
     public boolean isPickup(InventoryClickEvent event) {
         InventoryAction inventoryAction = event.getAction();
-        // TODO: check if it can be dhifted down
+
         if (event.getClickedInventory().getType() == InventoryType.CHEST && event.isShiftClick()) return true;
         return inventoryAction == InventoryAction.PICKUP_ALL || inventoryAction == InventoryAction.PICKUP_HALF || inventoryAction == InventoryAction.PICKUP_ONE || inventoryAction == InventoryAction.PICKUP_SOME;
 
@@ -251,11 +224,6 @@ public abstract class CorrespondingInventory implements Listener {
 
     public @NotNull JavaPlugin getPlugin() {
         return plugin;
-
-    }
-
-    public @Nullable ItemStack getInitialItem(int slot) {
-        return inventory.getItem(slot);
 
     }
 

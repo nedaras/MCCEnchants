@@ -21,9 +21,8 @@ public class Utils {
 
     public static ItemStack hiddenItemStackName(Material material) {
 
-
         ItemStack item = new ItemStack(material);
-        if (!item.hasItemMeta()) return item;
+        if (material == Material.AIR) return item;
 
         ItemMeta meta = item.getItemMeta();
 

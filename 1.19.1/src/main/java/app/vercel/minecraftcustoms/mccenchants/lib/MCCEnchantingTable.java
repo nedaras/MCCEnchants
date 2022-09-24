@@ -35,6 +35,7 @@ public class MCCEnchantingTable {
 
     public static @NotNull ItemStack enchantItem(@NotNull Random random, int enchantingCost, @NotNull ItemStack item) {
         item = item.clone();
+        item.setAmount(1);
 
         List<MCCEnchantmentInstance> enchantments = getEnchantments(random, enchantingCost, item);
         if (item.getType() == Material.BOOK) item.setType(Material.ENCHANTED_BOOK);
