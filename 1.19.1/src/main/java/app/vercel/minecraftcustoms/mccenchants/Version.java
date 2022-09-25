@@ -46,7 +46,7 @@ public class Version {
 
         try {
 
-            String currentVersion = "v1.0.1-RELEASE";
+            String currentVersion = "v1.0.0-RELEASE";
 
             URL url = new URL("https://minecraftcustoms.vercel.app/api/versions/" + plugin.getName().toLowerCase());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
