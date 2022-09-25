@@ -1,7 +1,0 @@
-name: MCCEnchants
-version: '${project.version}'
-main: app.vercel.minecraftcustoms.mccenchants.Main
-api-version: 1.18
-authors: [ Nedarass ]
-description: A Plugin to add custom enchants for the server.
-website: https://minecraftcustoms.vercel.app
