@@ -6,7 +6,7 @@
 
     <groupId>io.github.nedaras</groupId>
     <artifactId>MCCEnchants</artifactId>
-    <version>1.0.0-RELEASE</version>
+    <version>v1.0.0-RELEASE</version>
     <packaging>jar</packaging>
 
     <name>MCCEnchants</name>
