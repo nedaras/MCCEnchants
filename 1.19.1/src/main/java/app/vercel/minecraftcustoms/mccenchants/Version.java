@@ -15,6 +15,9 @@ import java.util.logging.Level;
 
 public class Version {
 
+    // if you change this to true you will get premium for free :D
+    private static final boolean premium = false;
+
     private static @NotNull String version = "N/A";
     private static @Nullable JavaPlugin plugin;
     private static boolean alreadySet = false;
@@ -43,9 +46,9 @@ public class Version {
 
         try {
 
-            String currentVersion = "1.19-R0.1-SNAPSHOT";
+            String currentVersion = "v1.0.1-RELEASE";
 
-            URL url = new URL("https://minecraftcustoms.vercel.app/api/versions/" + plugin.getName().toLowerCase() + "?version=" + version);
+            URL url = new URL("https://minecraftcustoms.vercel.app/api/versions/" + plugin.getName().toLowerCase());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             connection.setRequestMethod("GET");
@@ -75,7 +78,8 @@ public class Version {
 
             }
 
-            plugin.getLogger().info( plugin.getName() + " plugin is outdated by (" + amount + ") versions, update here: https://minecraftcustoms.vercel.app/download/custom-enchants");
+            String downloadURL = premium ? "https://www.spigotmc.org/resources/mccenchants.104731/" : "https://github.com/nedaras/MCCEnchants";
+            plugin.getLogger().info( plugin.getName() + " plugin is outdated by (" + amount + ") versions, update here: " + downloadURL);
 
         } catch (Exception __) {
             plugin.getLogger().warning("Could fetch latest version of " + plugin.getName());
