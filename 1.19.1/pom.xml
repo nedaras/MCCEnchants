@@ -6,7 +6,7 @@
 
     <groupId>io.github.nedaras</groupId>
     <artifactId>MCCEnchants</artifactId>
-    <version>1.19-R0.1-SNAPSHOT</version>
+    <version>1.0.0-RELEASE</version>
     <packaging>jar</packaging>
 
     <name>MCCEnchants</name>
@@ -72,10 +72,6 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>C:\Users\Nedas\Desktop\paper 1.18.2\plugins\${name}-${version}.jar</outputFile>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
