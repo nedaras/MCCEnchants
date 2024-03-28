@@ -3,10 +3,10 @@ package app.vercel.minecraftcustoms.mccenchants.utils;
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCEnchanting;
 import app.vercel.minecraftcustoms.mccenchants.managers.InventoryItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -20,11 +20,11 @@ import java.util.*;
 public class Utils {
 
     public static ItemStack hiddenItemStackName(Material material) {
-
         ItemStack item = new ItemStack(material);
         if (material == Material.AIR) return item;
 
         ItemMeta meta = item.getItemMeta();
+        if (meta == null) return item;
 
         meta.setDisplayName(ChatColor.RESET + "");
 
@@ -74,16 +74,16 @@ public class Utils {
     }
 
     private static ItemMeta signItemStack(@NotNull ItemStack item) {
-
         net.minecraft.world.item.ItemStack craftItem = CraftItemStack.asNMSCopy(item);
-        NBTTagCompound tag = craftItem.v();
+        CompoundTag tag = craftItem.getTag();
 
-        tag.a("MCCEnchantment", true);
-
-        craftItem.c(tag);
+        // NOTE: WARNINGS
+        if (tag != null) {
+            tag.putBoolean("MCCEnchantment", true);
+            craftItem.setTag(tag);
+        }
 
         return CraftItemStack.asBukkitCopy(craftItem).getItemMeta();
-
     }
 
     public static boolean isUpToDate(@NotNull ItemStack item) {
@@ -106,11 +106,13 @@ public class Utils {
 
         net.minecraft.world.item.ItemStack craftItem = CraftItemStack.asNMSCopy(item);
 
-        if (!craftItem.t()) return false;
+        if (!craftItem.hasTag()) return false;
 
-        NBTTagCompound tag = craftItem.u();
+        CompoundTag tag = craftItem.getTag();
+        // TODO: refactor check if hasTag and tag == != null is same thing
+        if (tag == null) return false;
 
-        return tag.e("MCCEnchantment");
+        return tag.contains("MCCEnchantment");
 
     }
 

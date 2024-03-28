@@ -4,26 +4,26 @@ import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.utils.MCCEnchantmentInstance;
 import com.google.common.collect.Lists;
-import net.minecraft.SystemUtils;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.core.IRegistry;
-import net.minecraft.util.MathHelper;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.random.WeightedRandom2;
+import net.minecraft.util.random.WeightedRandom;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentManager;
-import net.minecraft.world.item.enchantment.WeightedRandomEnchant;
-import net.minecraft.world.level.World;
-import net.minecraft.world.level.block.BlockEnchantmentTable;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import net.minecraft.world.level.block.EnchantmentTableBlock;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_19_R1.util.RandomSourceWrapper;
+import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.util.RandomSourceWrapper;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -51,8 +51,8 @@ public class MCCEnchantingTable {
     }
 
     public static boolean canEnchantItem(@NotNull ItemStack item) {
-        if (item.getEnchantments().size() > 0) return false;
-        if (CraftItemStack.asNMSCopy(item).c().c() <= 0) return false;
+        if (!item.getEnchantments().isEmpty()) return false;
+        if (CraftItemStack.asNMSCopy(item).getItem().getEnchantmentValue() <= 0) return false;
 
         return item.getType() == Material.BOOK || EnchantmentTarget.BREAKABLE.includes(item);
 
@@ -61,42 +61,38 @@ public class MCCEnchantingTable {
     public static List<MCCEnchantmentInstance> getEnchantments(@NotNull Random random, int enchantingCost, @NotNull ItemStack item) {
 
         List<MCCEnchantmentInstance> mccEnchantments = new ArrayList<>();
-        List<WeightedRandomEnchant> enchantments = b(random, CraftItemStack.asNMSCopy(item), enchantingCost, false);
+        List<EnchantmentInstance> enchantments = b(random, CraftItemStack.asNMSCopy(item), enchantingCost, false);
 
         if (item.getType() == Material.BOOK && enchantments.size() > 1) {
             enchantments.remove(random.nextInt(enchantments.size()));
-
         }
 
-        enchantments.forEach((enchantment) -> {
-            MCCEnchantment mccEnchantment = new CraftMCCEnchantment(enchantment.a);
-            mccEnchantments.add(new MCCEnchantmentInstance(mccEnchantment, enchantment.b));
-
-        });
+        for (EnchantmentInstance enchantment : enchantments) {
+            MCCEnchantment mccEnchantment = CraftMCCEnchantment.minecraftToBukkit(enchantment.enchantment);
+            mccEnchantments.add(new MCCEnchantmentInstance(mccEnchantment, enchantment.level));
+        }
 
         return mccEnchantments;
 
     }
 
     public static int getEnchantingCost(@NotNull Random random, int slot, int bookshelves, @NotNull ItemStack item) {
-        int cost = EnchantmentManager.a(new RandomSourceWrapper(random), slot - 1, bookshelves, CraftItemStack.asNMSCopy(item));
+        int cost = EnchantmentHelper.getEnchantmentCost(new RandomSourceWrapper(random), slot - 1, bookshelves, CraftItemStack.asNMSCopy(item));
         return cost < slot ? 0 : cost;
 
     }
 
     public static int getSurroundingBookshelves(@NotNull Block block) {
-
         int bookshelves = 0;
 
-        List<BlockPosition> offsets = BlockEnchantmentTable.b;
-        World world = ((CraftWorld) block.getWorld()).getHandle();
+        List<BlockPos> offsets = EnchantmentTableBlock.BOOKSHELF_OFFSETS;
+        ServerLevel world = ((CraftWorld) block.getWorld()).getHandle();
 
         Location location = block.getLocation();
-        BlockPosition position = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        BlockPos position = new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 
-        for (BlockPosition offset : offsets) {
-            if (BlockEnchantmentTable.a(world, position, offset)) bookshelves++;
-
+        for (BlockPos offset : offsets) {
+            if (EnchantmentTableBlock.isValidBookShelf(world, position, offset)) bookshelves++;
         }
 
         return Math.min(bookshelves, 15);
@@ -105,45 +101,47 @@ public class MCCEnchantingTable {
 
     public static int getEnchantingSeed(@NotNull Player player) {
         CraftPlayer craftPlayer = (CraftPlayer) player;
-        return craftPlayer.getHandle().fI();
+        return craftPlayer.getHandle().getEnchantmentSeed();
 
     }
 
+    // TODO: pass item stack that we're enchanting.
     public static void updateEnchantingSeed(@NotNull Player player) {
         CraftPlayer craftPlayer = (CraftPlayer) player;
-        craftPlayer.getHandle().a(CraftItemStack.asNMSCopy(new ItemStack(Material.AIR)), 0);
+        craftPlayer.getHandle().onEnchantmentPerformed(CraftItemStack.asNMSCopy(new ItemStack(Material.AIR)), 0);
 
     }
 
     // Fixing canEnchantItem bug
 
-    public static List<WeightedRandomEnchant> b(Random var0, net.minecraft.world.item.ItemStack var1, int var2, boolean var3) {
+    public static List<EnchantmentInstance> b(Random var0, net.minecraft.world.item.ItemStack var1, int var2, boolean var3) {
         RandomSource randomSource = new RandomSourceWrapper(var0);
-        List<WeightedRandomEnchant> var4 = Lists.newArrayList();
-        Item var5 = var1.c();
-        int var6 = var5.c();
+        List<EnchantmentInstance> var4 = Lists.newArrayList();
+        Item var5 = var1.getItem();
+        int var6 = var5.getEnchantmentValue();
         if (var6 <= 0) {
             return var4;
         } else {
-            var2 += 1 + randomSource.a(var6 / 4 + 1) + randomSource.a(var6 / 4 + 1);
-            float var7 = (randomSource.i() + randomSource.i() - 1.0F) * 0.15F;
-            var2 = MathHelper.a(Math.round((float)var2 + (float)var2 * var7), 1, Integer.MAX_VALUE);
-            List<WeightedRandomEnchant> var8 = a(var2, var1, var3);
+            var2 += 1 + randomSource.nextInt(var6 / 4 + 1) + randomSource.nextInt(var6 / 4 + 1);
+            float var7 = (randomSource.nextFloat() + randomSource.nextFloat() - 1.0F) * 0.15F;
+            var2 = Mth.clamp(Math.round((float)var2 + (float)var2 * var7), 1, Integer.MAX_VALUE);
+            List<EnchantmentInstance> var8 = a(var2, var1, var3);
             if (!var8.isEmpty()) {
-                Optional<WeightedRandomEnchant> var10000 = WeightedRandom2.a(randomSource, var8);
+                Optional<EnchantmentInstance> var10000 = WeightedRandom.getRandomItem(randomSource, var8);
                 Objects.requireNonNull(var4);
                 var10000.ifPresent(var4::add);
 
-                while(randomSource.a(50) <= var2) {
+                while(randomSource.nextInt(50) <= var2) {
                     if (!var4.isEmpty()) {
-                        EnchantmentManager.a(var8, SystemUtils.a(var4));
+                        EnchantmentHelper.filterCompatibleEnchantments(var8, Util.lastOf(var4));
+
                     }
 
                     if (var8.isEmpty()) {
                         break;
                     }
 
-                    var10000 = WeightedRandom2.a(randomSource, var8);
+                    var10000 = WeightedRandom.getRandomItem(randomSource, var8);
                     Objects.requireNonNull(var4);
                     var10000.ifPresent(var4::add);
                     var2 /= 2;
@@ -154,10 +152,10 @@ public class MCCEnchantingTable {
         }
     }
 
-    public static List<WeightedRandomEnchant> a(int var0, net.minecraft.world.item.ItemStack var1, boolean var2) {
-        List<WeightedRandomEnchant> var3 = Lists.newArrayList();
-        boolean var5 = var1.a(Items.oY);
-        Iterator<Enchantment> var6 = IRegistry.W.iterator();
+    public static List<EnchantmentInstance> a(int var0, net.minecraft.world.item.ItemStack var1, boolean var2) {
+        List<EnchantmentInstance> var3 = Lists.newArrayList();
+        boolean var5 = var1.is(Items.BOOK);
+        Iterator<Enchantment> var6 = BuiltInRegistries.ENCHANTMENT.iterator();
 
         while(true) {
             Enchantment var7;
@@ -169,13 +167,13 @@ public class MCCEnchantingTable {
                         }
 
                         var7 = var6.next();
-                    } while(var7.b() && !var2);
-                } while(!var7.i());
-            } while(!var7.a(var1) && !var5); // here
+                    } while(var7.isTreasureOnly() && !var2);
+                } while(!var7.isDiscoverable());
+            } while(!var7.canEnchant(var1) && !var5); // here
 
-            for(int var8 = var7.a(); var8 > var7.e() - 1; --var8) {
-                if (var0 >= var7.a(var8) && var0 <= var7.b(var8)) {
-                    var3.add(new WeightedRandomEnchant(var7, var8));
+            for(int var8 = var7.getMaxLevel(); var8 > var7.getMaxLevel() - 1; --var8) {
+                if (var0 >= var7.getMinCost(var8) && var0 <= var7.getMaxCost(var8)) {
+                    var3.add(new EnchantmentInstance(var7, var8));
                     break;
                 }
             }

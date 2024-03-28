@@ -2,56 +2,71 @@ package app.vercel.minecraftcustoms.mccenchants.enchantments;
 
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.EnchantmentRarity;
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
-import net.minecraft.core.IRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.enchantment.Enchantment;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftNamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.craftbukkit.v1_20_R3.CraftRegistry;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.util.Handleable;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Objects;
+public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<Enchantment> {
 
-public class CraftMCCEnchantment extends MCCEnchantment {
+    // TODO: would it not be better if we extended Enchantment and CraftEnchantment from bukkit, we're kinda the same just better
+    private final NamespacedKey key;
+    private final Enchantment handle;
+    private final int id;
 
-    private final net.minecraft.world.item.enchantment.Enchantment target;
-
-    private static final HashMap<NamespacedKey, String> names = new HashMap<>();
-
-    public CraftMCCEnchantment(net.minecraft.world.item.enchantment.Enchantment target) {
-        super(CraftNamespacedKey.fromMinecraft(Objects.requireNonNull(IRegistry.W.b(target))));
-        this.target = target;
-        if (target instanceof NMSEnchantment) names.put(((NMSEnchantment) target).getKey(), ((NMSEnchantment) target).getName());
+    public static MCCEnchantment minecraftToBukkit(Enchantment minecraft) {
+        org.bukkit.enchantments.Enchantment enchantment = CraftRegistry.minecraftToBukkit(minecraft, Registries.ENCHANTMENT, Registry.ENCHANTMENT);
+        return MCCEnchantment.toMCCEnchantment(enchantment);
     }
 
-    public CraftMCCEnchantment(MCCEnchantment target) {
-        super(target.getKey());
-        this.target = new NMSEnchantment(target);
-        if (!names.containsKey(target.getKey())) names.put(target.getKey(), target.getName());
+    public static Enchantment bukkitToMinecraft(MCCEnchantment bukkit) {
+        return CraftRegistry.bukkitToMinecraft(bukkit);
+    }
+
+    public CraftMCCEnchantment(NamespacedKey key, net.minecraft.world.item.enchantment.Enchantment handle) {
+        //super(CraftNamespacedKey.fromMinecraft(Objects.requireNonNull(BuiltInRegistries.ENCHANTMENT.getKey(target))));
+        this.handle = handle;
+        this.key = key;
+        this.id = BuiltInRegistries.ENCHANTMENT.getId(handle);
+        //if (target instanceof NMSEnchantment) names.put(((NMSEnchantment) target).getKey(), ((NMSEnchantment) target).getName());
+    }
+
+    public net.minecraft.world.item.enchantment.Enchantment getHandle() {
+        return this.handle;
+    }
+
+    @NotNull
+    public NamespacedKey getKey() {
+        return this.key;
     }
 
     @Override
     public int getMaxLevel() {
-        return this.target.a();
+        return this.handle.getMaxLevel();
 
     }
 
     @Override
     public int getStartLevel() {
-        return this.target.e();
+        return this.handle.getMinLevel();
     }
 
     @Override
     public @NotNull EnchantmentRarity getRarity() {
 
-        switch (target.d().a()) {
+        switch (handle.getRarity().getWeight()) {
             case 10: return EnchantmentRarity.COMMON;
             case 5: return EnchantmentRarity.UNCOMMON;
             case 2: return EnchantmentRarity.RARE;
             case 1: return EnchantmentRarity.VERY_RARE;
-            default: throw new IllegalArgumentException("Enchantment Rarity with weight doesn't exist: " + target.d().a());
+            default: throw new IllegalArgumentException("Enchantment Rarity with weight doesn't exist: " + handle.getRarity().getWeight());
 
         }
 
@@ -59,20 +74,20 @@ public class CraftMCCEnchantment extends MCCEnchantment {
 
     @Override
     public int getMinCost(int level) {
-        return target.a(level);
+        return handle.getMinCost(level);
 
     }
 
     @Override
     public int getMaxCost(int level) {
-        return target.b(level);
+        return handle.getMaxCost(level);
 
     }
 
     @Override
     public @NotNull EnchantmentTarget getItemTarget() {
 
-        switch(target.e.ordinal()) {
+        switch(handle.category.ordinal()) {
             case 0:
                 return EnchantmentTarget.ARMOR;
             case 1:
@@ -101,43 +116,41 @@ public class CraftMCCEnchantment extends MCCEnchantment {
                 return EnchantmentTarget.CROSSBOW;
             case 13:
                 return EnchantmentTarget.VANISHABLE;
-            default: throw new IllegalStateException("Could not found EnchantmentTarget with id: " + target.e.ordinal());
+            default:
+                throw new IncompatibleClassChangeError();
         }
     }
 
     @Override
     public boolean isTreasure() {
-        return this.target.b();
+        return this.handle.isTreasureOnly();
     }
 
     @Override
     public boolean isCursed() {
-        return this.target.c();
+        return this.handle.isCurse();
     }
 
     @Override
     public boolean isTradable() {
-        return target.h();
+        return handle.isTradeable();
 
     }
 
     @Override
     public boolean isDiscoverable() {
-        return target.i();
+        return handle.isDiscoverable();
 
     }
 
     @Override
     public boolean canEnchantItem(@NotNull ItemStack item) {
-        return this.target.a(CraftItemStack.asNMSCopy(item));
+        return this.handle.canEnchant(CraftItemStack.asNMSCopy(item));
     }
 
     @Override
     public @NotNull String getName() {
-
-        if (names.containsKey(getKey())) return names.get(getKey());
-
-        switch(IRegistry.W.a(target)) {
+        switch(this.id) {
             case 1:
                 return "PROTECTION_ENVIRONMENTAL";
             case 2:
@@ -215,34 +228,40 @@ public class CraftMCCEnchantment extends MCCEnchantment {
             case 38:
                 return "VANISHING_CURSE";
             default:
-                return  "UNKNOWN_ENCHANT_" + IRegistry.W.a(target);
+                return  "UNKNOWN_ENCHANT_" + BuiltInRegistries.ENCHANTMENT.getId(handle);
         }
-    }
-
-    public static @Nullable net.minecraft.world.item.enchantment.Enchantment getRaw(MCCEnchantment enchantment) {
-        if (enchantment instanceof MCCEnchantmentWrapper) {
-            enchantment = ((MCCEnchantmentWrapper)enchantment).getEnchantment();
-        }
-
-        return enchantment instanceof CraftMCCEnchantment ? ((CraftMCCEnchantment)enchantment).target : null;
     }
 
     @Override
     public boolean conflictsWith(@NotNull MCCEnchantment other) {
-        if (other instanceof MCCEnchantmentWrapper) {
-            other = ((MCCEnchantmentWrapper) other).getEnchantment();
-        }
-
         if (!(other instanceof CraftMCCEnchantment)) {
             return false;
         } else {
             CraftMCCEnchantment enchantment = (CraftMCCEnchantment) other;
-            return !target.b(enchantment.target);
+            return !handle.isCompatibleWith(enchantment.handle);
         }
     }
 
-    public net.minecraft.world.item.enchantment.Enchantment getHandle() {
-        return this.target;
+
+    @NotNull
+    public String getTranslationKey() {
+        return this.handle.getDescriptionId();
+    }
+
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        } else {
+            return !(other instanceof CraftMCCEnchantment) ? false : this.getKey().equals(((MCCEnchantment) other).getKey());
+        }
+    }
+   public int hashCode() {
+        return this.key.hashCode();
+   }
+
+    @NotNull
+    public String toString() {
+        return "CraftEnchantment[" + this.getKey() + "]";
     }
 
 }

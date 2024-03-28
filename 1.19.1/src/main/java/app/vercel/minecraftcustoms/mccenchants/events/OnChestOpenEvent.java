@@ -2,14 +2,16 @@ package app.vercel.minecraftcustoms.mccenchants.events;
 
 import app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCEnchanting;
 import app.vercel.minecraftcustoms.mccenchants.utils.Utils;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.world.level.World;
-import net.minecraft.world.level.block.entity.TileEntityChest;
-import net.minecraft.world.level.chunk.Chunk;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.inventory.EnchantmentMenu;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -41,20 +43,17 @@ public class OnChestOpenEvent implements Listener {
             if (MCCEnchanting.getEnchantments(item).isEmpty()) continue;
 
             Utils.convertEnchantsToLore(item);
-
         }
-
     }
 
     private boolean isChestAlreadyGenerated(@NotNull Block block) {
 
-        World world = ((CraftWorld) block.getWorld()).getHandle();
-        Chunk chunk = world.d(block.getWorld().getChunkAt(block).getX(), block.getWorld().getChunkAt(block).getZ());
+        ServerLevel world = ((CraftWorld) block.getWorld()).getHandle();
+        LevelChunk chunk = world.getChunk(block.getWorld().getChunkAt(block).getX(), block.getWorld().getChunkAt(block).getZ());
 
-        TileEntityChest tileEntityChest = (TileEntityChest) chunk.c_(new BlockPosition(block.getX(), block.getY(), block.getZ()));
+        ChestBlockEntity tileEntityChest = (ChestBlockEntity) chunk.getBlockEntity(new BlockPos(block.getX(), block.getY(), block.getZ()));
 
-        return tileEntityChest.g == null;
-
+        if (tileEntityChest == null) return true;
+        return tileEntityChest.lootTable == null;
     }
-
 }

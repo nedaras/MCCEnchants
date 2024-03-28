@@ -1,13 +1,14 @@
 package app.vercel.minecraftcustoms.mccenchants.enchantments;
 
+import app.vercel.minecraftcustoms.mccenchants.Main;
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.EnchantmentRarity;
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
-import net.minecraft.world.entity.EnumItemSlot;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentSlotType;
+import net.minecraft.world.item.enchantment.EnchantmentCategory;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,42 +19,41 @@ public class NMSEnchantment extends Enchantment {
     private static @NotNull Rarity toNMSRarity(@NotNull EnchantmentRarity rarity) {
 
         switch (rarity) {
-            case COMMON: return Rarity.a;
-            case UNCOMMON: return Rarity.b;
-            case RARE: return Rarity.c;
-            default: return Rarity.d;
-
+            case COMMON: return Rarity.COMMON;
+            case UNCOMMON: return Rarity.UNCOMMON;
+            case RARE: return Rarity.RARE;
+            case VERY_RARE: return Rarity.VERY_RARE;
+            default: return  Rarity.VERY_RARE; // TODO: print error
         }
-
     }
 
-    private static @NotNull EnchantmentSlotType toNMSEnchantmentSlotType(@NotNull EnchantmentTarget target) {
+    private static @NotNull EnchantmentCategory toNMSEnchantmentSlotType(@NotNull EnchantmentTarget target) {
 
         switch (target) {
-            case ARMOR: return EnchantmentSlotType.a;
-            case ARMOR_FEET: return EnchantmentSlotType.b;
-            case ARMOR_LEGS: return EnchantmentSlotType.c;
-            case ARMOR_TORSO: return EnchantmentSlotType.d;
-            case ARMOR_HEAD: return EnchantmentSlotType.e;
-            case WEAPON: return  EnchantmentSlotType.f;
-            case TOOL: return EnchantmentSlotType.g;
-            case FISHING_ROD: return EnchantmentSlotType.h;
-            case TRIDENT: return EnchantmentSlotType.i;
-            case BREAKABLE: return EnchantmentSlotType.j;
-            case BOW: return EnchantmentSlotType.k;
-            case WEARABLE: return EnchantmentSlotType.l;
-            case CROSSBOW: return EnchantmentSlotType.m;
-            default: return EnchantmentSlotType.n;
-
+            case ARMOR: return EnchantmentCategory.ARMOR;
+            case ARMOR_FEET: return EnchantmentCategory.ARMOR_FEET;
+            case ARMOR_LEGS: return EnchantmentCategory.ARMOR_LEGS;
+            case ARMOR_TORSO: return EnchantmentCategory.ARMOR_CHEST;
+            case ARMOR_HEAD: return EnchantmentCategory.ARMOR_HEAD;
+            case WEAPON: return  EnchantmentCategory.WEAPON;
+            case TOOL: return EnchantmentCategory.DIGGER;
+            case FISHING_ROD: return EnchantmentCategory.FISHING_ROD;
+            case TRIDENT: return EnchantmentCategory.TRIDENT;
+            case BREAKABLE: return EnchantmentCategory.BREAKABLE;
+            case BOW: return EnchantmentCategory.BOW;
+            case WEARABLE: return EnchantmentCategory.WEARABLE;
+            case CROSSBOW: return EnchantmentCategory.CROSSBOW;
+            case VANISHABLE: return EnchantmentCategory.VANISHABLE;
+            default: return EnchantmentCategory.VANISHABLE; // TODO: log error
         }
-
     }
 
     public NMSEnchantment(MCCEnchantment enchantment) {
-        super(toNMSRarity(enchantment.getRarity()), toNMSEnchantmentSlotType(enchantment.getItemTarget()), EnumItemSlot.values());
+        super(toNMSRarity(enchantment.getRarity()), toNMSEnchantmentSlotType(enchantment.getItemTarget()), EquipmentSlot.values());
         this.enchantment = enchantment;
     }
 
+    // TODO: these things aint even used
     public @NotNull String getName() {
         return enchantment.getName();
 
@@ -63,62 +63,62 @@ public class NMSEnchantment extends Enchantment {
 
     }
 
-
     @Override
-    public int e() {
+    public int getMinLevel() {
         return enchantment.getStartLevel();
 
     }
 
     @Override
-    public int a() {
+    public int getMaxLevel() {
         return enchantment.getMaxLevel();
 
     }
 
     @Override
-    public int a(int level) {
+    public int getMaxCost(int level) {
         return enchantment.getMaxCost(level);
     }
 
     @Override
-    public int b(int level) {
+    public int getMinCost(int level) {
         return enchantment.getMinCost(level);
     }
 
     @Override
-    public boolean a(Enchantment other) {
-        CraftMCCEnchantment enchantment = new CraftMCCEnchantment(other);
+    public boolean checkCompatibility(Enchantment other) {
+        CraftMCCEnchantment enchantment = (CraftMCCEnchantment) CraftMCCEnchantment.minecraftToBukkit(other);
         return !enchantment.equals(this.enchantment) && !this.enchantment.conflictsWith(enchantment);
 
     }
 
     @Override
-    public boolean b() {
+    public boolean isTreasureOnly() {
         return enchantment.isTreasure();
 
     }
 
     @Override
-    public boolean c() {
+    public boolean isCurse() {
         return enchantment.isCursed();
 
     }
 
+    // TODO: fix spelling mistakes
     @Override
-    public boolean h() {
+    public boolean isTradeable() {
         return enchantment.isTradable();
 
     }
 
     @Override
-    public boolean i() {
+    public boolean isDiscoverable() {
         return enchantment.isDiscoverable();
 
     }
 
     @Override
-    public boolean a(ItemStack item) {
+    public boolean canEnchant(ItemStack item) {
         return enchantment.canEnchantItem(CraftItemStack.asBukkitCopy(item));
 
     }
