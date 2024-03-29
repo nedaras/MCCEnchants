@@ -89,7 +89,7 @@
                         <manifestEntries>
                             <Premain-Class>app.vercel.minecraftcustoms.mccenchants.hooks.Agent</Premain-Class>
                             <Agent-Class>app.vercel.minecraftcustoms.mccenchants.hooks.Agent</Agent-Class>
-                            <Can-Redefine-Classes>false</Can-Redefine-Classes>
+                            <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                         </manifestEntries>
                     </archive>
@@ -163,9 +163,14 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.12.1.GA</version>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>9.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-tree</artifactId>
+            <version>9.5</version>
         </dependency>
     </dependencies>
 </project>

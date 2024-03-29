@@ -1,13 +1,35 @@
 package app.vercel.minecraftcustoms.mccenchants.hooks;
 
 import java.lang.instrument.Instrumentation;
+import java.lang.instrument.UnmodifiableClassException;
 
 public class Agent {
 
-    public static void agentmain(String agentArgs, Instrumentation instrumentation) {
+    public static void premain(String agentArgs, Instrumentation instrumentation) {
+        System.out.println("Premain executed...");
+       instrumentation.addTransformer(new Transformer());
+    }
 
-        for (Class<?> clazz : instrumentation.getAllLoadedClasses()) {
-            if (clazz.getName().startsWith("app.vercel")) System.out.println(clazz.getName());
+    public static void agentmain(String agentArgs, Instrumentation instrumentation) {
+        System.out.println("Agentmain executed...");
+        instrumentation.addTransformer(new Transformer(), true);
+
+        for (Class<?> clazz : instrumentation.getAllLoadedClasses())
+        {
+            if (!clazz.getName().equals("org.bukkit.craftbukkit.v1_20_R3.CraftServer")) continue;
+            if (!instrumentation.isModifiableClass(clazz)) {
+                // TODO: add some idk report link and it would be nice to link a MCCEnchants logger
+                System.out.println("Trying to modify not modifiable class: " + clazz.getName());
+                continue;
+            };
+
+            try {
+                instrumentation.retransformClasses(clazz);
+            } catch (UnmodifiableClassException e) {
+                throw new RuntimeException();
+            }
+
+            break;
         }
     }
 }

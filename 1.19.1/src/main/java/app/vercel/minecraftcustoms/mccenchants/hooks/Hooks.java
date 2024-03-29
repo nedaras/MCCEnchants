@@ -1,13 +1,6 @@
 package app.vercel.minecraftcustoms.mccenchants.hooks;
 
-import app.vercel.minecraftcustoms.mccenchants.Main;
 import com.sun.tools.attach.VirtualMachine;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.NotFoundException;
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
