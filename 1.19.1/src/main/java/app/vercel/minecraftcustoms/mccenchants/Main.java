@@ -17,6 +17,7 @@ public final class Main extends JavaPlugin {
 
         //MCCEnchantment.registerMinecraftEnchantments(this);
         MCCEnchantment.registerEnchantment(new CustomEnchantment());
+
         Hooks.init();
         this.getLogger().info(this.getServer().getVersion());
         //InventoryManager.registerInventories(this);
