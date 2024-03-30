@@ -7,6 +7,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
@@ -22,7 +23,6 @@ public class Transformer implements ClassFileTransformer {
         InsnList instructions = new InsnList();
 
         try {
-            //Class.forName("app.vercel.minecraftcustoms.mccenchants.hooks.Test", false, Agent.loader);
 
             ClassReader reader = new ClassReader("app.vercel.minecraftcustoms.mccenchants.hooks.Test");
             ClassNode node = new ClassNode(Opcodes.ASM5);
@@ -63,7 +63,16 @@ public class Transformer implements ClassFileTransformer {
             ClassWriter writer = new AgentClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES, loader);
             node.accept(writer);
 
-            return writer.toByteArray();
+            byte[] bytes = writer.toByteArray();
+
+
+            try (FileOutputStream fos = new FileOutputStream("C:\\Users\\nedas\\Desktop\\paper\\plugins\\CraftItemStack.class")) {
+                fos.write(bytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return bytes;
 
         } catch (Exception e) {
             System.out.println("oh my gad " + className);
