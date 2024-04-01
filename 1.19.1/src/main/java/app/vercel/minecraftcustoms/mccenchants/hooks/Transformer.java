@@ -18,7 +18,7 @@ public class Transformer implements ClassFileTransformer {
     @Override
     public byte[] transform(ClassLoader loader, String className, Class classBeingRedefined, ProtectionDomain protectionDomain, byte[] classFileBuffer) throws IllegalClassFormatException {
         if (classBeingRedefined == null) return classFileBuffer;
-        if (!className.equals("org/bukkit/craftbukkit/v1_20_R3/inventory/CraftItemStack")) return classFileBuffer;
+        if (!className.equals("net/minecraft/world/item/ItemStack")) return classFileBuffer;
 
         InsnList instructions = new InsnList();
 
@@ -30,7 +30,7 @@ public class Transformer implements ClassFileTransformer {
             reader.accept(node, 0);
 
             for (MethodNode methodNode : node.methods) {
-                if (!methodNode.name.equals("addUnsafeEnchantment")) continue;
+                if (!methodNode.name.equals("addTagElement")) continue;
                 for (AbstractInsnNode insnNode : methodNode.instructions) {
                     if (insnNode instanceof VarInsnNode a) { a.var--; } // we need to move argument by one
                 }
@@ -51,12 +51,23 @@ public class Transformer implements ClassFileTransformer {
 
             for (MethodNode methodNode : node.methods)
             {
-                if (!methodNode.name.equals("addUnsafeEnchantment")) continue;
-                if (!methodNode.desc.equals("(Lorg/bukkit/enchantments/Enchantment;I)V")) continue;
+                if (!methodNode.name.equals("a")) continue;
+                if (!methodNode.desc.equals("(Ljava/lang/String;Lnet/minecraft/nbt/NBTBase;)V")) continue;
+                //for (AbstractInsnNode ab : methodNode.instructions) {
+                    //System.out.println(ab.getOpcode() + " " + ab);
+                //}
 
-                // HOW TO INSERT AAA
-                methodNode.instructions.insert(instructions);
+                AbstractInsnNode insnNode = methodNode.instructions.getLast();
 
+                while (insnNode.getPrevious() != null) {
+                    if (insnNode.getOpcode() == Opcodes.RETURN) {
+                        insnNode = insnNode.getPrevious();
+                        break;
+                    }
+                    insnNode = insnNode.getPrevious();
+                }
+
+                methodNode.instructions.insert(insnNode, instructions);
                 break;
             }
 
@@ -65,8 +76,13 @@ public class Transformer implements ClassFileTransformer {
 
             byte[] bytes = writer.toByteArray();
 
+            try (FileOutputStream fos = new FileOutputStream("C:\\Users\\nedas\\Desktop\\paper\\plugins\\ItemStackOriginal.class")) {
+                fos.write(classFileBuffer);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-            try (FileOutputStream fos = new FileOutputStream("C:\\Users\\nedas\\Desktop\\paper\\plugins\\CraftItemStack.class")) {
+            try (FileOutputStream fos = new FileOutputStream("C:\\Users\\nedas\\Desktop\\paper\\plugins\\ItemStack.class")) {
                 fos.write(bytes);
             } catch (IOException e) {
                 e.printStackTrace();

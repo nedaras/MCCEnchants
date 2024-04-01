@@ -16,7 +16,7 @@ public class Agent {
 
         for (Class<?> clazz : instrumentation.getAllLoadedClasses())
         {
-            if (!clazz.getName().equals("org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack")) continue;
+            if (!clazz.getName().equals("net.minecraft.world.item.ItemStack")) continue;
             if (!instrumentation.isModifiableClass(clazz)) {
                 // TODO: add some idk report link and it would be nice to link a MCCEnchants logger
                 System.out.println("Trying to modify not modifiable class: " + clazz.getName());
@@ -33,6 +33,8 @@ public class Agent {
             }
 
             System.out.println("Dont forget to break here and remove modifier");
+
+            break;
 
         }
     }

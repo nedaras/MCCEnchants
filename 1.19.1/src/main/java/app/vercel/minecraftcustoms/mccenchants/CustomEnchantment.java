@@ -83,6 +83,6 @@ public class CustomEnchantment extends MCCEnchantment {
     @NotNull
     @Override
     public String getTranslationKey() {
-        return "custom_enchantment";
+        return "Atejau ir ispisau";
     }
 }

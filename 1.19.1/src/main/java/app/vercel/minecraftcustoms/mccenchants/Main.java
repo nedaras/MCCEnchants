@@ -19,8 +19,7 @@ public final class Main extends JavaPlugin {
         MCCEnchantment.registerEnchantment(new CustomEnchantment());
 
         Hooks.init();
-        this.getLogger().info(this.getServer().getVersion());
-        //InventoryManager.registerInventories(this);
+        //InventoryManager.registerInventories(this); // we will need them inventories
 
         //registerEvents();
 
