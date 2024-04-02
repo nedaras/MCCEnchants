@@ -2,6 +2,8 @@ package app.vercel.minecraftcustoms.mccenchants.hooks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.*;
 import org.bukkit.ChatColor;
@@ -29,16 +31,14 @@ public class Test {
         // we will use color codes to store some data, why?
         // future problem how would we get custom enchant names?
         CraftItemStack craftItemStack = CraftItemStack.asCraftMirror(itemStack);
-        ItemMeta meta = craftItemStack.getItemMeta();
-
-        if (meta == null) return;
-
-        List<String> lore = new ArrayList<>();
 
         String HEADER = "" + ChatColor.RESET + ChatColor.UNDERLINE + ChatColor.RESET;
         String FOOTER = "" + ChatColor.RESET + ChatColor.STRIKETHROUGH + ChatColor.RESET;
 
+        // we will remove r encoding cus it will just be removed
         char[] codes = new char[] {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','k','l','m','n','o','r' };
+
+        List<String> lore = new ArrayList<>();
 
         for (Map.Entry<Enchantment, Integer> entry : craftItemStack.getEnchantments().entrySet()) {
             net.minecraft.world.item.enchantment.Enchantment nmsEnchantment = CraftEnchantment.bukkitToMinecraft(entry.getKey());
@@ -54,35 +54,64 @@ public class Test {
             String mustHaveEncodin = HEADER + encoded + FOOTER;
 
             // MAKE SO GOLD WOULD BE THERE AAA
-            String l = "" + ChatColor.GOLD + ChatColor.RESET + entry.getKey().getKey() + " " + ChatColor.RESET + entry.getValue();
+            String l = entry.getKey().getKey() + " " + entry.getValue();
 
             MutableComponent currentComp = Component.empty();
 
             // will try to make my own component I fucking hope that spigot leaved the component away
             Style style = Style.EMPTY;
-            style = style.withItalic(Boolean.FALSE);
+
+            // i think 3 color codes would be enough for storing &{1-2}&r
+            // cuz like if ur adding lore ur self and before ur string there is that &r it will just be removed
 
             currentComp.append(Component.literal("").withStyle(style.withColor(ChatFormatting.RED)));
             currentComp.append(Component.literal("").withStyle(style.withUnderlined(Boolean.TRUE)));
-            currentComp.append(Component.literal("").withStyle(style.withColor(ChatFormatting.RESET)));
+            currentComp.append(Component.literal("").withStyle(style.withColor(ChatFormatting.RED)));
 
             // we will encode some shit here
 
 
             currentComp.append(Component.literal("").withStyle(style.withColor(ChatFormatting.RED)));
             currentComp.append(Component.literal("").withStyle(style.withStrikethrough(Boolean.TRUE)));
-            currentComp.append(Component.literal("").withStyle(style.withColor(ChatFormatting.RESET)));
+            currentComp.append(Component.literal("").withStyle(style.withItalic(Boolean.FALSE).withColor(ChatFormatting.RESET)));
+            currentComp.append(Component.literal(l).withStyle(style.withItalic(Boolean.FALSE)));
+
+            //currentComp.append(CraftChatMessage.fromString(l)[0]); // it appends the text with extra its bad we only need extras inside to append we will fix it in first place were looping in wrong position
 
             // we will get current lores component and then append
 
-            System.out.println(CraftChatMessage.toJSON(currentComp));
-            System.out.println(CraftChatMessage.fromComponent(currentComp));
+            CompoundTag compoundTag = itemStack.getTagElement("display"); // we need to create orCreate crashed idk why
+            if (compoundTag == null) {
+                lore.add(l);
+                continue;
+            }
+            ListTag listTag = compoundTag.getList("Lore", 8);
+            if (listTag == null) {
+                System.out.println("we're null");
+                listTag = new ListTag();
+                compoundTag.put("Lore", listTag);
+            }
 
-            // fuck this i will change the lore with nbt tags
-            lore.add(l);
+            StringTag stringTag = StringTag.valueOf(CraftChatMessage.toJSON(currentComp));
+            listTag.add(stringTag);
+
+            CompoundTag tag = itemStack.getTag();
+            if (tag == null) return;
+
+            //System.out.println(listTag.getAsString());
+
+            // when we will set the tag we need to pray that when we will recv it from meta the encoding will still be there
+            //lore.add(CraftChatMessage.fromComponent(currentComp));
         }
-        meta.setLore(lore);
-        craftItemStack.setItemMeta(meta);
+
+
+        ItemMeta meta = craftItemStack.getItemMeta();
+        if (!lore.isEmpty()) {
+            meta.setLore(lore);
+            craftItemStack.setItemMeta(meta);
+        }
+
+        if (!craftItemStack.getItemMeta().hasLore()) return;
         List<String> newLore = craftItemStack.getItemMeta().getLore();
         for (String l : newLore) {
             System.out.println(l);
