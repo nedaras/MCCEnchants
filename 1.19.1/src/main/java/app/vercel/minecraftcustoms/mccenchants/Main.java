@@ -21,13 +21,6 @@ public final class Main extends JavaPlugin {
 
         //MCCEnchantment.registerMinecraftEnchantments(this);
         MCCEnchantment.registerEnchantment(new CustomEnchantment());
-
-        CraftItemStack itemStack = CraftItemStack.asCraftCopy(new ItemStack(Material.GOLDEN_HOE)); // item meta is some idk not minecraft shit mb it will work when spawning items
-        // addUnsafeEnchantment should be called wtice but it seems that it can early return
-        itemStack.addEnchantment(Enchantment.DIG_SPEED, 3);
-        itemStack.addEnchantment(Enchantment.DIG_SPEED, 4);
-        itemStack.removeEnchantment(Enchantment.DIG_SPEED);
-
         Hooks.init();
         //InventoryManager.registerInventories(this); // we will need them inventories
 

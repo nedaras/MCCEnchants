@@ -68,5 +68,4 @@ public class Agent {
     public static @NotNull ClassNode getClassNode() {
         return classNode;
     }
-
 }
