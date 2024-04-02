@@ -1,104 +1,76 @@
 package app.vercel.minecraftcustoms.mccenchants.hooks;
 
-import org.bukkit.plugin.PluginLoader;
-import org.bukkit.plugin.PluginLogger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Transformer implements ClassFileTransformer {
 
     @Override
     public byte[] transform(ClassLoader loader, String className, Class classBeingRedefined, ProtectionDomain protectionDomain, byte[] classFileBuffer) throws IllegalClassFormatException {
         if (classBeingRedefined == null) return classFileBuffer;
-        if (!className.equals("net/minecraft/world/item/ItemStack")) return classFileBuffer;
 
-        InsnList instructions = new InsnList();
+        Map<String, InsnList> instructions = new HashMap<>();
+        ClassNode classNode = Agent.getClassNode();
 
-        try {
+        for (MethodNode method : classNode.methods) {
+            convertInstructions(method.instructions);
 
-            ClassReader reader = new ClassReader("app.vercel.minecraftcustoms.mccenchants.hooks.Test");
-            ClassNode node = new ClassNode(Opcodes.ASM5);
-
-            reader.accept(node, 0);
-
-            for (MethodNode methodNode : node.methods) {
-                if (!methodNode.name.equals("addTagElement")) continue;
-                for (AbstractInsnNode insnNode : methodNode.instructions) {
-                    if (insnNode instanceof VarInsnNode a) { a.var--; } // we need to move argument by one
-                }
-                instructions.insert(methodNode.instructions);
-                break;
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            if (method.name.equals("addTagElement")) instructions.put("(Ljava/lang/String;Lnet/minecraft/nbt/NBTBase;)V", method.instructions);
+            if (method.name.equals("enchant")) instructions.put("(Lnet/minecraft/world/item/enchantment/Enchantment;I)V", method.instructions);
         }
 
         try {
 
             ClassReader reader = new ClassReader(classFileBuffer);
-            ClassNode node = new ClassNode(Opcodes.ASM5);
+            ClassNode node = new ClassNode(Opcodes.ASM4);
 
             reader.accept(node, 0);
 
-            for (MethodNode methodNode : node.methods)
-            {
-                if (!methodNode.name.equals("a")) continue;
-                if (!methodNode.desc.equals("(Ljava/lang/String;Lnet/minecraft/nbt/NBTBase;)V")) continue;
-                //for (AbstractInsnNode ab : methodNode.instructions) {
-                    //System.out.println(ab.getOpcode() + " " + ab);
-                //}
+            for (MethodNode method : node.methods) {
+                if (!method.name.equals("a")) continue;
+                if (!instructions.containsKey(method.desc)) continue;
 
-                AbstractInsnNode insnNode = methodNode.instructions.getLast();
+                System.out.println("inserted too: " + method.desc);
 
-                while (insnNode.getPrevious() != null) {
-                    if (insnNode.getOpcode() == Opcodes.RETURN) {
-                        insnNode = insnNode.getPrevious();
-                        break;
-                    }
-                    insnNode = insnNode.getPrevious();
-                }
-
-                methodNode.instructions.insert(insnNode, instructions);
-                break;
+                method.instructions.insert(getInsertion(method.instructions), instructions.get(method.desc));
             }
 
             ClassWriter writer = new AgentClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES, loader);
             node.accept(writer);
 
-            byte[] bytes = writer.toByteArray();
-
-            try (FileOutputStream fos = new FileOutputStream("C:\\Users\\nedas\\Desktop\\paper\\plugins\\ItemStackOriginal.class")) {
-                fos.write(classFileBuffer);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try (FileOutputStream fos = new FileOutputStream("C:\\Users\\nedas\\Desktop\\paper\\plugins\\ItemStack.class")) {
-                fos.write(bytes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return bytes;
-
+            return writer.toByteArray();
         } catch (Exception e) {
-            System.out.println("oh my gad " + className);
-            e.printStackTrace();
+           e.printStackTrace();
         }
-
 
         return classFileBuffer;
 
     }
 
+    private static void convertInstructions(InsnList instructionsList) {
+        for (AbstractInsnNode instruction : instructionsList) {
+            if (instruction instanceof VarInsnNode varInstruction) varInstruction.var--;
+        }
+    }
 
+    private static AbstractInsnNode getInsertion(InsnList instructionList) {
+        AbstractInsnNode instruction = instructionList.getLast();
+
+        while (instruction.getPrevious() != null) {
+            if (instruction.getOpcode() == Opcodes.RETURN) {
+                instruction = instruction.getPrevious();
+                break;
+            }
+            instruction = instruction.getPrevious();
+        }
+        return instruction;
+    }
 }
