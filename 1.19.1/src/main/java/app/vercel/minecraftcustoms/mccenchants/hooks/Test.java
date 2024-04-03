@@ -32,83 +32,45 @@ public class Test {
         // future problem how would we get custom enchant names?
         CraftItemStack craftItemStack = CraftItemStack.asCraftMirror(itemStack);
 
-        String HEADER = "" + ChatColor.RESET + ChatColor.UNDERLINE + ChatColor.RESET;
-        String FOOTER = "" + ChatColor.RESET + ChatColor.STRIKETHROUGH + ChatColor.RESET;
-
-        // we will remove r encoding cus it will just be removed
-        char[] codes = new char[] {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f','k','l','m','n','o','r' };
-
-        List<String> lore = new ArrayList<>();
+        // we need to add those letter too so we could store more enchantment
+        // now we can only store 100 enchantment 10^2 why we cant store letter for some reason the &r removed these letters but numbers can stack
+        // we should not leave this to base 10 like cmon we could use base 22 or atleast base 21 from 100 enchants we could store about 500
+        char[] codes = new char[] {'0','1','2','3','4','5','6','7','8','9', 'a','b','c','d','e','f','k','l','m','n','o', 'r' };
 
         for (Map.Entry<Enchantment, Integer> entry : craftItemStack.getEnchantments().entrySet()) {
             net.minecraft.world.item.enchantment.Enchantment nmsEnchantment = CraftEnchantment.bukkitToMinecraft(entry.getKey());
             int id = BuiltInRegistries.ENCHANTMENT.getId(nmsEnchantment);
+
             StringBuilder encoded = new StringBuilder();
-            while (id != 0) {
+
+            //ChatFormatting[] encoded = new ChatFormatting[2];
+            for (char pos = 0; pos < 2; pos++) {
                 int i = id % codes.length;
                 encoded.insert(0, ChatColor.getByChar(codes[i]));
+                //encoded[encoded.length - 1 - pos] = ChatFormatting.getByCode(codes[i]);
                 id /= codes.length;
             }
-            // spigot is removing my encoding they prob are doing to that to clear space
-            // we could try to use persistent data prob or idk somehow set the lore with encoding
-            String mustHaveEncodin = HEADER + encoded + FOOTER;
 
-            // MAKE SO GOLD WOULD BE THERE AAA
             String l = entry.getKey().getKey() + " " + entry.getValue();
 
-            MutableComponent currentComp = Component.empty();
-
-            // will try to make my own component I fucking hope that spigot leaved the component away
+            MutableComponent component = Component.empty();
             Style style = Style.EMPTY;
 
-            // i think 3 color codes would be enough for storing &{1-2}&r
-            // cuz like if ur adding lore ur self and before ur string there is that &r it will just be removed
+            //component.append(Component.literal("").withStyle(style.withColor(encoded[0])));
+            //component.append(Component.literal("").withStyle(style.withColor(encoded[1])));
 
-            currentComp.append(Component.literal("").withStyle(style.withColor(ChatFormatting.RED)));
-            currentComp.append(Component.literal("").withStyle(style.withUnderlined(Boolean.TRUE)));
-            currentComp.append(Component.literal("").withStyle(style.withColor(ChatFormatting.RED)));
+            // why the fuck spigot makes it into that three then? like this way we're storing so much less data
+            // should we use italic false cuz thats how spigot does it.
+            component.append(Component.literal(encoded.toString() + ChatColor.RESET).withStyle(style));
+            //component.append(Component.literal("").withStyle(style.withColor(ChatFormatting.RESET)));
+            //component.append(Component.literal(l).withStyle(style)); // this is shit
+            component.append(CraftChatMessage.fromString(l)[0]); // I mean it works but this aint the spigot way it has that extra in extra
 
-            // we will encode some shit here
+            CompoundTag display = itemStack.getOrCreateTagElement("display");
+            if (!display.contains("Lore")) display.put("Lore", new ListTag());
 
-
-            currentComp.append(Component.literal("").withStyle(style.withColor(ChatFormatting.RED)));
-            currentComp.append(Component.literal("").withStyle(style.withStrikethrough(Boolean.TRUE)));
-            currentComp.append(Component.literal("").withStyle(style.withItalic(Boolean.FALSE).withColor(ChatFormatting.RESET)));
-            currentComp.append(Component.literal(l).withStyle(style.withItalic(Boolean.FALSE)));
-
-            //currentComp.append(CraftChatMessage.fromString(l)[0]); // it appends the text with extra its bad we only need extras inside to append we will fix it in first place were looping in wrong position
-
-            // we will get current lores component and then append
-
-            CompoundTag compoundTag = itemStack.getTagElement("display"); // we need to create orCreate crashed idk why
-            if (compoundTag == null) {
-                lore.add(l);
-                continue;
-            }
-            ListTag listTag = compoundTag.getList("Lore", 8);
-            if (listTag == null) {
-                System.out.println("we're null");
-                listTag = new ListTag();
-                compoundTag.put("Lore", listTag);
-            }
-
-            StringTag stringTag = StringTag.valueOf(CraftChatMessage.toJSON(currentComp));
-            listTag.add(stringTag);
-
-            CompoundTag tag = itemStack.getTag();
-            if (tag == null) return;
-
-            //System.out.println(listTag.getAsString());
-
-            // when we will set the tag we need to pray that when we will recv it from meta the encoding will still be there
-            //lore.add(CraftChatMessage.fromComponent(currentComp));
-        }
-
-
-        ItemMeta meta = craftItemStack.getItemMeta();
-        if (!lore.isEmpty()) {
-            meta.setLore(lore);
-            craftItemStack.setItemMeta(meta);
+            ListTag lore = display.getList("Lore", ListTag.TAG_STRING);
+            lore.add(StringTag.valueOf(CraftChatMessage.toJSON(component)));
         }
 
         if (!craftItemStack.getItemMeta().hasLore()) return;
