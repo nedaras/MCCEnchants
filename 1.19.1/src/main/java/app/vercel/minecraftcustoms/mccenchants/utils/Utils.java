@@ -19,6 +19,7 @@ import java.util.*;
 
 public class Utils {
 
+    // TODO: cut all of this shit
     public static ItemStack hiddenItemStackName(Material material) {
         ItemStack item = new ItemStack(material);
         if (material == Material.AIR) return item;

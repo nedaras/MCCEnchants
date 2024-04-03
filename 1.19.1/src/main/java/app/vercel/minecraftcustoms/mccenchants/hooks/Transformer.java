@@ -5,6 +5,8 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
@@ -21,8 +23,7 @@ public class Transformer implements ClassFileTransformer {
         ClassNode classNode = Agent.getClassNode();
 
         for (MethodNode method : classNode.methods) {
-            convertInstructions(method.instructions);
-
+            if (method.name.equals("addUnsafeEnchantment")) instructions.put("(Lorg/bukkit/enchantments/Enchantment;I)V", method.instructions);
             if (method.name.equals("addTagElement")) instructions.put("(Ljava/lang/String;Lnet/minecraft/nbt/NBTBase;)V", method.instructions);
             if (method.name.equals("enchant")) instructions.put("(Lnet/minecraft/world/item/enchantment/Enchantment;I)V", method.instructions);
         }
@@ -30,35 +31,34 @@ public class Transformer implements ClassFileTransformer {
         try {
 
             ClassReader reader = new ClassReader(classFileBuffer);
-            ClassNode node = new ClassNode(Opcodes.ASM4);
+            ClassNode node = new ClassNode(Opcodes.ASM5);
 
             reader.accept(node, 0);
 
             for (MethodNode method : node.methods) {
-                if (!method.name.equals("a")) continue;
                 if (!instructions.containsKey(method.desc)) continue;
+                if (!(method.name.equals("a") || method.name.equals("addUnsafeEnchantment"))) continue;
 
                 System.out.println("inserted too: " + method.desc);
-
                 method.instructions.insert(getInsertion(method.instructions), instructions.get(method.desc));
             }
 
             ClassWriter writer = new AgentClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES, loader);
             node.accept(writer);
 
-            return writer.toByteArray();
+            byte[] result = writer.toByteArray();
+
+            FileOutputStream fos = new FileOutputStream("C:\\Users\\nedas\\Desktop\\paper\\plugins\\" + className.replace("/", ".") + ".class");
+            fos.write(result);
+            fos.close();
+
+            return result;
         } catch (Exception e) {
-           e.printStackTrace();
+            e.printStackTrace();
         }
 
         return classFileBuffer;
 
-    }
-
-    private static void convertInstructions(InsnList instructionsList) {
-        for (AbstractInsnNode instruction : instructionsList) {
-            if (instruction instanceof VarInsnNode varInstruction) varInstruction.var--;
-        }
     }
 
     private static AbstractInsnNode getInsertion(InsnList instructionList) {

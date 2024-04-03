@@ -3,7 +3,7 @@ package app.vercel.minecraftcustoms.mccenchants.hooks;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.*;
 
 import java.io.IOException;
 import java.lang.instrument.Instrumentation;
@@ -44,6 +44,7 @@ public class Agent {
                 instrumentation.retransformClasses(clazz);
             } catch (UnmodifiableClassException e) {
                 e.printStackTrace();
+                instrumentation.removeTransformer(transformer);
                 throw new RuntimeException();
             }
 
@@ -61,10 +62,20 @@ public class Agent {
 
         reader.accept(node, 0);
 
+        for (MethodNode methodNode : node.methods) {
+            convertInstructions(methodNode.instructions);
+        }
+
         classNode = node;
 
     }
 
+
+    private static void convertInstructions(InsnList instructionsList) {
+        for (AbstractInsnNode instruction : instructionsList) {
+            if (instruction instanceof VarInsnNode varInstruction) varInstruction.var--;
+        }
+    }
     public static @NotNull ClassNode getClassNode() {
         return classNode;
     }

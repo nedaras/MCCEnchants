@@ -47,15 +47,16 @@ public abstract class MCCEnchantment implements Keyed, Translatable {
     }
 
     public @NotNull String getDisplayName() {
-        if (this instanceof CustomEnchantment)
+        if (this instanceof CustomEnchantment a)
         {
-            return "Custom Enchantment";
+            return a.getName();
         }
 
         return toEnchantment(this).getName();
 
     }
 
+    // TODO: cut this
     public @NotNull String getDisplayName(int level) {
         String romeNumber = getMaxLevel() > 1 ? " " + Utils.toRomeNumber(level) : "";
         return getDisplayName() + romeNumber;
