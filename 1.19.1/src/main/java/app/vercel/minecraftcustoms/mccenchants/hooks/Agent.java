@@ -57,7 +57,7 @@ public class Agent {
 
     private static void load() throws IOException {
 
-        ClassReader reader = new ClassReader("app.vercel.minecraftcustoms.mccenchants.hooks.Test");
+        ClassReader reader = new ClassReader("app.vercel.minecraftcustoms.mccenchants.hooks.Hooks");
         ClassNode node = new ClassNode(Opcodes.ASM5);
 
         reader.accept(node, 0);

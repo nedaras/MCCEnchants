@@ -24,7 +24,6 @@ public class Transformer implements ClassFileTransformer {
 
         for (MethodNode method : classNode.methods) {
             if (method.name.equals("addUnsafeEnchantment")) instructions.put("(Lorg/bukkit/enchantments/Enchantment;I)V", method.instructions);
-            if (method.name.equals("addTagElement")) instructions.put("(Ljava/lang/String;Lnet/minecraft/nbt/NBTBase;)V", method.instructions);
             if (method.name.equals("enchant")) instructions.put("(Lnet/minecraft/world/item/enchantment/Enchantment;I)V", method.instructions);
         }
 
