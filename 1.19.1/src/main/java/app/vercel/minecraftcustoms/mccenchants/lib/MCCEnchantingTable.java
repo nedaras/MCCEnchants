@@ -38,11 +38,17 @@ public class MCCEnchantingTable {
         item.setAmount(1);
 
         List<MCCEnchantmentInstance> enchantments = getEnchantments(random, enchantingCost, item);
-        if (item.getType() == Material.BOOK) item.setType(Material.ENCHANTED_BOOK);
+        //if (item.getType() == Material.BOOK) item.setType(Material.ENCHANTED_BOOK);
+
+        if (item.getType() == Material.BOOK) {
+            System.out.println("fuck");
+            return item;
+        }
 
         for (MCCEnchantmentInstance instance : enchantments) {
-
-            app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCEnchanting.setEnchantment(item, instance.getEnchantment(), instance.getLevel());
+            // We dont rly need to use MCCenchantment everywhere
+            //app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCEnchanting.setEnchantment(item, instance.getEnchantment(), instance.getLevel());
+            item.addUnsafeEnchantment(MCCEnchantment.toEnchantment(instance.getEnchantment()), instance.getLevel());
 
         }
 

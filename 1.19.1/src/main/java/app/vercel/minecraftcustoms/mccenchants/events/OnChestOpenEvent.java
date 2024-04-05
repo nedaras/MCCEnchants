@@ -27,23 +27,23 @@ public class OnChestOpenEvent implements Listener {
     @EventHandler
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
 
-        if (!event.hasBlock()) return;
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        if (event.getClickedBlock().getType() != Material.CHEST) return;
-        if (isChestAlreadyGenerated(event.getClickedBlock())) return;
-
-        Chest chest = (Chest) event.getClickedBlock().getState();
-        Inventory inventory = chest.getBlockInventory();
-
-        for (int i = 0; i < inventory.getSize(); i++) {
-
-            ItemStack item = inventory.getItem(i);
-
-            if (item == null) continue;
-            if (MCCEnchanting.getEnchantments(item).isEmpty()) continue;
-
-            Utils.convertEnchantsToLore(item);
-        }
+//        if (!event.hasBlock()) return;
+//        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+//        if (event.getClickedBlock().getType() != Material.CHEST) return;
+//        if (isChestAlreadyGenerated(event.getClickedBlock())) return;
+//
+//        Chest chest = (Chest) event.getClickedBlock().getState();
+//        Inventory inventory = chest.getBlockInventory();
+//
+//        for (int i = 0; i < inventory.getSize(); i++) {
+//
+//            ItemStack item = inventory.getItem(i);
+//
+//            if (item == null) continue;
+//            if (MCCEnchanting.getEnchantments(item).isEmpty()) continue;
+//
+//            Utils.convertEnchantsToLore(item);
+//        }
     }
 
     private boolean isChestAlreadyGenerated(@NotNull Block block) {

@@ -15,28 +15,28 @@ public class OnVillagerInteractEvent implements Listener {
     @EventHandler
     public void onPlayerInteractEntityEvent(PlayerInteractEntityEvent event) {
 
-        if (!(event.getRightClicked() instanceof Villager)) return;
-        if (!tradesEnchantedItems(event.getRightClicked())) return;
-
-        Villager villager = (Villager) event.getRightClicked();
-
-        for (int i = 0; i < villager.getRecipes().size(); i++) {
-
-            MerchantRecipe recipe = villager.getRecipe(i);
-
-            ItemStack item = recipe.getResult();
-
-            if (MCCEnchanting.getEnchantments(item).isEmpty()) continue;
-            if (Utils.isItemStackSinged(item)) continue;
-
-            Utils.convertEnchantsToLore(item);
-
-            MerchantRecipe newRecipe = new MerchantRecipe(item, recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(), recipe.getVillagerExperience(), recipe.getPriceMultiplier(), recipe.getDemand(), recipe.getSpecialPrice());
-            newRecipe.setIngredients(recipe.getIngredients());
-
-            villager.setRecipe(i, newRecipe);
-
-        }
+//        if (!(event.getRightClicked() instanceof Villager)) return;
+//        if (!tradesEnchantedItems(event.getRightClicked())) return;
+//
+//        Villager villager = (Villager) event.getRightClicked();
+//
+//        for (int i = 0; i < villager.getRecipes().size(); i++) {
+//
+//            MerchantRecipe recipe = villager.getRecipe(i);
+//
+//            ItemStack item = recipe.getResult();
+//
+//            if (MCCEnchanting.getEnchantments(item).isEmpty()) continue;
+//            if (Utils.isItemStackSinged(item)) continue;
+//
+//            Utils.convertEnchantsToLore(item);
+//
+//            MerchantRecipe newRecipe = new MerchantRecipe(item, recipe.getUses(), recipe.getMaxUses(), recipe.hasExperienceReward(), recipe.getVillagerExperience(), recipe.getPriceMultiplier(), recipe.getDemand(), recipe.getSpecialPrice());
+//            newRecipe.setIngredients(recipe.getIngredients());
+//
+//            villager.setRecipe(i, newRecipe);
+//
+//        }
 
     }
 

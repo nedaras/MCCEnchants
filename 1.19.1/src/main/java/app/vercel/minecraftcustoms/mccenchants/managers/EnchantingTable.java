@@ -174,7 +174,8 @@ public final class EnchantingTable extends CorrespondingInventory {
             Map<String, String> placeholders = new HashMap<>();
 
             placeholders.put("level", cost + "");
-            placeholders.put("enchantment", enchantment.getEnchantment().getDisplayName(enchantment.getLevel()));
+            // TODO: rome number yo
+            placeholders.put("enchantment", enchantment.getEnchantment().getName() + " " + enchantment.getLevel());
 
             if (player.getGameMode() != GameMode.CREATIVE && player.getLevel() < cost) {
 

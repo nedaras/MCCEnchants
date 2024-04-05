@@ -11,10 +11,10 @@ public class OnPlayerPickupItemEvent implements Listener {
     @EventHandler
     public void onPlayerPickupItemEvent(PlayerPickupItemEvent event) {
 
-        if (MCCEnchanting.getEnchantments(event.getItem().getItemStack()).isEmpty()) return;
-        if (Utils.isUpToDate(event.getItem().getItemStack())) return;
-
-        Utils.convertEnchantsToLore(event.getItem().getItemStack());
+//        if (MCCEnchanting.getEnchantments(event.getItem().getItemStack()).isEmpty()) return;
+//        if (Utils.isUpToDate(event.getItem().getItemStack())) return;
+//
+//        Utils.convertEnchantsToLore(event.getItem().getItemStack());
 
     }
 

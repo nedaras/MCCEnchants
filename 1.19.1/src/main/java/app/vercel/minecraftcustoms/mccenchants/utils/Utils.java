@@ -19,7 +19,6 @@ import java.util.*;
 
 public class Utils {
 
-    // TODO: cut all of this shit
     public static ItemStack hiddenItemStackName(Material material) {
         ItemStack item = new ItemStack(material);
         if (material == Material.AIR) return item;
@@ -35,106 +34,16 @@ public class Utils {
 
     }
 
-    public static void convertEnchantsToLore(@NotNull ItemStack item) {
-
-        if (MCCEnchanting.getEnchantments(item).isEmpty()) return;
-
-        ItemMeta meta = isItemStackSinged(item) ? item.getItemMeta() : signItemStack(item);
-        Map<Enchantment, Integer> enchants = MCCEnchanting.getEnchantments(item);
-
-        boolean isEnchantmentBook = item.getType() == Material.ENCHANTED_BOOK;
-        List<String> lore = new ArrayList<>();
-
-        for (Map.Entry<Enchantment, Integer> entry : enchants.entrySet()) {
-
-            MCCEnchantment mccEnchantment = MCCEnchantment.toMCCEnchantment(entry.getKey());
-
-            if (lore.contains(mccEnchantment.getDisplayName(entry.getValue()))) continue;
-            lore.add(mccEnchantment.getDisplayName(entry.getValue()));
-
-        }
-
-        if (isEnchantmentBook) {
-
-            EnchantmentStorageMeta bookMeta = (EnchantmentStorageMeta) meta;
-
-            bookMeta.addItemFlags(ItemFlag.values());
-            bookMeta.setLore(lore);
-
-            item.setItemMeta(bookMeta);
-
-            return;
-
-        }
-
-        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-        meta.setLore(lore);
-
-        item.setItemMeta(meta);
-
-    }
-
-    private static ItemMeta signItemStack(@NotNull ItemStack item) {
-        net.minecraft.world.item.ItemStack craftItem = CraftItemStack.asNMSCopy(item);
-        CompoundTag tag = craftItem.getTag();
-
-        // NOTE: WARNINGS
-        if (tag != null) {
-            tag.putBoolean("MCCEnchantment", true);
-            craftItem.setTag(tag);
-        }
-
-        return CraftItemStack.asBukkitCopy(craftItem).getItemMeta();
-    }
-
-    public static boolean isUpToDate(@NotNull ItemStack item) {
-
-        if (!isItemStackSinged(item)) return false;
-        if (!item.getItemMeta().hasLore()) return false;
-
-        for (Map.Entry<Enchantment, Integer> entry : MCCEnchanting.getEnchantments(item).entrySet()) {
-            MCCEnchantment enchantment = MCCEnchantment.toMCCEnchantment(entry.getKey());
-
-            if (!item.getItemMeta().getLore().contains(enchantment.getDisplayName(entry.getValue()))) return false;
-
-        }
-
-        return true;
-
-    }
-
-    public static boolean isItemStackSinged(@NotNull ItemStack item) {
-
-        net.minecraft.world.item.ItemStack craftItem = CraftItemStack.asNMSCopy(item);
-
-        if (!craftItem.hasTag()) return false;
-
-        CompoundTag tag = craftItem.getTag();
-        // TODO: refactor check if hasTag and tag == != null is same thing
-        if (tag == null) return false;
-
-        return tag.contains("MCCEnchantment");
-
-    }
-
-
     public static String toRomeNumber(int number) {
-
-        switch (number) {
-            case 1: return "I";
-            case 2: return "II";
-            case 3: return "III";
-            case 4: return "IV";
-            case 5: return "V";
-            case 6: return "VI";
-            case 7: return "VII";
-            case 8: return "VIII";
-            case 9: return "IX";
-            case 10: return "X";
-            default: return number + "";
-
-        }
-
+        return switch (number) {
+            case 1 -> "I";
+            case 2 -> "II";
+            case 3 -> "III";
+            case 4 -> "IV";
+            case 5 -> "V";
+            case 6 -> "VI";
+            default -> number + "";
+        };
     }
 
     public static boolean containsMaterial(@Nullable String material) {

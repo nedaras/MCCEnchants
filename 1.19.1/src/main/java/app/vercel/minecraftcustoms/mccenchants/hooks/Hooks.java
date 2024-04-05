@@ -90,10 +90,10 @@ public class Hooks {
         craftItemStack.setItemMeta(meta);
     }
 
+    // hook remove enchantment
+
     // this one works with enchantment table and if bukkit api would enchant the item
     // to note enchantments are stored in alphabetic order so i mena i can make these algorithms faster but im lazy for now
-
-    // do we need the remove enchantment shit?
     public void addUnsafeEnchantment(CraftItemStack craftItemStack, Enchantment enchantment, int level) { // THIS MUST BE HOOKED
         ItemMeta meta = craftItemStack.getItemMeta();
 
@@ -119,7 +119,7 @@ public class Hooks {
                     case 4 -> " " + ChatColor.GRAY + "IV";
                     case 5 -> " " + ChatColor.GRAY + "V";
                     case 6 -> " " + ChatColor.GRAY + "VI";
-                    default -> " " + ChatColor.GRAY + "net.minecraft.level." + entry.getValue();
+                    default -> " " + ChatColor.GRAY + entry.getValue();
                 };
             }
             // wait this work so mb we can encode with color... like if it would ahh it would be a dream come true

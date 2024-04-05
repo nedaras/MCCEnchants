@@ -8,10 +8,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class CustomEnchantment extends MCCEnchantment {
-    @Override
-    public @NotNull String getName() {
-        return "Custom Enchantment";
-    }
 
     @Override
     public int getMaxLevel() {

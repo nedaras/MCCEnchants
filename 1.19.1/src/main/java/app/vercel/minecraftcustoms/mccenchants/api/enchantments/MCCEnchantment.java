@@ -7,6 +7,7 @@ import app.vercel.minecraftcustoms.mccenchants.enchantments.NMSEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.utils.Utils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -24,9 +25,6 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public abstract class MCCEnchantment implements Keyed, Translatable {
-
-    private static final Map<NamespacedKey, CraftMCCEnchantment> byKey = new HashMap<>();
-    private static final Map<String, CraftMCCEnchantment> byName = new HashMap<>();
 
     public static @NotNull org.bukkit.enchantments.Enchantment toEnchantment(@NotNull MCCEnchantment enchantment) {
         return new CraftEnchantment(enchantment.getKey(), ((CraftMCCEnchantment) enchantment).getHandle());
@@ -46,23 +44,10 @@ public abstract class MCCEnchantment implements Keyed, Translatable {
         return toMCCEnchantment(enchantment);
     }
 
-    public @NotNull String getDisplayName() {
-        if (this instanceof CustomEnchantment a)
-        {
-            return a.getName();
-        }
-
-        return toEnchantment(this).getName();
+    public @NotNull String getName() {
+        return WordUtils.capitalizeFully(this.getKey().getKey().replace("_", " "));
 
     }
-
-    // TODO: cut this
-    public @NotNull String getDisplayName(int level) {
-        String romeNumber = getMaxLevel() > 1 ? " " + Utils.toRomeNumber(level) : "";
-        return getDisplayName() + romeNumber;
-    }
-
-    public abstract @NotNull String getName();
 
     public abstract int getMaxLevel();
 

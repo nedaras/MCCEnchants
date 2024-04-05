@@ -149,95 +149,10 @@ public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<En
     }
 
     @Override
-    public @NotNull String getName() {
-        switch(this.id) {
-            case 1:
-                return "PROTECTION_ENVIRONMENTAL";
-            case 2:
-                return "PROTECTION_FIRE";
-            case 3:
-                return "PROTECTION_FALL";
-            case 4:
-                return "PROTECTION_EXPLOSIONS";
-            case 5:
-                return "PROTECTION_PROJECTILE";
-            case 6:
-                return "OXYGEN";
-            case 7:
-                return "WATER_WORKER";
-            case 8:
-                return "THORNS";
-            case 9:
-                return "DEPTH_STRIDER";
-            case 10:
-                return "FROST_WALKER";
-            case 11:
-                return "BINDING_CURSE";
-            case 12:
-                return "SOUL_SPEED";
-            case 13:
-                return "DAMAGE_ALL";
-            case 14:
-                return "DAMAGE_UNDEAD";
-            case 15:
-                return "DAMAGE_ARTHROPODS";
-            case 16:
-                return "KNOCKBACK";
-            case 17:
-                return "FIRE_ASPECT";
-            case 18:
-                return "LOOT_BONUS_MOBS";
-            case 19:
-                return "SWEEPING_EDGE";
-            case 20:
-                return "DIG_SPEED";
-            case 21:
-                return "SILK_TOUCH";
-            case 22:
-                return "DURABILITY";
-            case 23:
-                return "LOOT_BONUS_BLOCKS";
-            case 24:
-                return "ARROW_DAMAGE";
-            case 25:
-                return "ARROW_KNOCKBACK";
-            case 26:
-                return "ARROW_FIRE";
-            case 27:
-                return "ARROW_INFINITE";
-            case 28:
-                return "LUCK";
-            case 29:
-                return "LURE";
-            case 30:
-                return "LOYALTY";
-            case 31:
-                return "IMPALING";
-            case 32:
-                return "RIPTIDE";
-            case 33:
-                return "CHANNELING";
-            case 34:
-                return "MULTISHOT";
-            case 35:
-                return "QUICK_CHARGE";
-            case 36:
-                return "PIERCING";
-            case 37:
-                return "MENDING";
-            case 38:
-                return "VANISHING_CURSE";
-            default:
-                return  "UNKNOWN_ENCHANT_" + BuiltInRegistries.ENCHANTMENT.getId(handle);
-        }
-    }
-
-    @Override
     public boolean conflictsWith(@NotNull MCCEnchantment other) {
-        if (!(other instanceof CraftMCCEnchantment)) {
+        if (!(other instanceof CraftMCCEnchantment enchantment)) {
             return false;
         } else {
-            CraftMCCEnchantment enchantment = (CraftMCCEnchantment) other;
             return !handle.isCompatibleWith(enchantment.handle);
         }
     }
