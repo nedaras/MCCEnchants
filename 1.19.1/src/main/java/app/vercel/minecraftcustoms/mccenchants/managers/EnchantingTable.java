@@ -147,6 +147,7 @@ public final class EnchantingTable extends CorrespondingInventory {
 
     }
 
+    // something is bad here
     private void updateEnchants(InventoryClickEvent event) {
 
         Player player = (Player) event.getWhoClicked();
@@ -154,18 +155,29 @@ public final class EnchantingTable extends CorrespondingInventory {
         ItemStack inputItem = event.getInventory().getItem(inputSlot);
         ItemStack lapisItem = lapisLazuliSlot >= 0 ? event.getInventory().getItem(lapisLazuliSlot) : null;
 
+
         int bookshelves = getBookshelves(player);
 
+        System.out.println(inputItem);
+        System.out.println(lapisItem);
+        System.out.println(bookshelves);
+
         boolean isLapisLazuli = lapisItem != null && lapisItem.getType() == Material.LAPIS_LAZULI;
+
+        System.out.println(isLapisLazuli);
 
         for (int enchantingSlot = 1; enchantingSlot <= 3; enchantingSlot++) {
 
             Random random = new Random(MCCEnchantingTable.getEnchantingSeed(player) + (enchantingSlot - 1));
 
+            System.out.println(random);
+
             int cost = MCCEnchantingTable.getEnchantingCost(random, enchantingSlot, bookshelves, inputItem);
+            System.out.println(cost);
             if (cost < enchantingSlot) continue;
 
             MCCEnchantmentInstance enchantment = getFirstEnchant(random, inputItem, cost);
+            System.out.println(enchantment);
             if (enchantment == null) continue;
 
             InventoryItemStack inventoryItem = this.getSavedItemsWithFunction("enchant_item", "enchant_" + enchantingSlot);
