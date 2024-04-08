@@ -1,23 +1,16 @@
 package app.vercel.minecraftcustoms.mccenchants;
 
-import app.vercel.minecraftcustoms.mccenchants.events.*;
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.managers.InventoryManager;
-import io.netty.channel.Channel;
+import app.vercel.minecraftcustoms.mccenchants.packets.PacketHandler;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
-import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.*;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerCommonPacketListenerImpl;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.MerchantOffer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,19 +18,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import javax.xml.transform.stream.StreamSource;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 
 public final class Main extends JavaPlugin implements Listener {
 
     private static JavaPlugin INSTANCE;
-    private static boolean IS_HOOKED = false; // we need this
 
     @Override
     public void onEnable() {
@@ -46,28 +32,12 @@ public final class Main extends JavaPlugin implements Listener {
         //Version.setVersion(this);
 
         MCCEnchantment.registerEnchantment(new CustomEnchantment());
-        InventoryManager.registerInventories(this); // we will need them inventories
+        //InventoryManager.registerInventories(this); // we will need them inventories
 
         this.getServer().getPluginManager().registerEvents(this, this);
 
         for (Player player : Bukkit.getOnlinePlayers()) {
-
-            ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-            ServerCommonPacketListenerImpl listener = serverPlayer.connection;
-
-            try {
-                Field f = listener.getClass().getField("c");
-                f.setAccessible(true);
-
-                Connection connection = (Connection) f.get(listener);
-                Channel channel = connection.channel;
-
-                channel.pipeline().addBefore("packet_handler", "MCCEnchants", new PacketHandler());
-
-                f.setAccessible(false);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            PacketHandler.addPlayer(player);
         }
 
         registerEvents();
@@ -75,46 +45,13 @@ public final class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void playerJoin(PlayerJoinEvent event) {
-
-        ServerPlayer serverPlayer = ((CraftPlayer) event.getPlayer()).getHandle();
-        ServerCommonPacketListenerImpl listener = serverPlayer.connection;
-
-        try {
-            Field f = listener.getClass().getField("c");
-            f.setAccessible(true);
-
-            Connection connection = (Connection) f.get(listener);
-            Channel channel = connection.channel;
-
-            channel.pipeline().addBefore("packet_handler", "MCCEnchants", new PacketHandler());
-
-            f.setAccessible(false);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        PacketHandler.addPlayer(event.getPlayer());
     }
 
 
     @EventHandler
     public void playerQuit(PlayerQuitEvent event) {
-
-        ServerPlayer serverPlayer = ((CraftPlayer) event.getPlayer()).getHandle();
-        ServerCommonPacketListenerImpl listener = serverPlayer.connection;
-
-        try {
-            Field f = listener.getClass().getField("c");
-            f.setAccessible(true);
-
-            Connection connection = (Connection) f.get(listener);
-            Channel channel = connection.channel;
-
-            if (channel.pipeline().get("MCCEnchants") == null) return;
-            channel.pipeline().remove("MCCEnchants");
-
-            f.setAccessible(false);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        PacketHandler.removePlayer(event.getPlayer());
     }
 
     @EventHandler
@@ -126,26 +63,8 @@ public final class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-
         for (Player player : Bukkit.getOnlinePlayers()) {
-
-            ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-            ServerCommonPacketListenerImpl listener = serverPlayer.connection;
-
-            try {
-                Field f = listener.getClass().getField("c");
-                f.setAccessible(true);
-
-                Connection connection = (Connection) f.get(listener);
-                Channel channel = connection.channel;
-
-                if (channel.pipeline().get("MCCEnchants") == null) continue;
-                channel.pipeline().remove("MCCEnchants");
-
-                f.setAccessible(false);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
+            PacketHandler.removePlayer(player);
         }
     }
 
@@ -164,7 +83,7 @@ public final class Main extends JavaPlugin implements Listener {
     }
 }
 
-class PacketHandler extends ChannelDuplexHandler {
+class PacketHandler2 extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
