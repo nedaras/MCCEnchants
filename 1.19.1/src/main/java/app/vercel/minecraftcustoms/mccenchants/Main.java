@@ -1,17 +1,10 @@
 package app.vercel.minecraftcustoms.mccenchants;
 
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
-import app.vercel.minecraftcustoms.mccenchants.managers.InventoryManager;
 import app.vercel.minecraftcustoms.mccenchants.packets.PacketHandler;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
-import net.minecraft.network.protocol.game.*;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.trading.MerchantOffer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,6 +13,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class Main extends JavaPlugin implements Listener {
 
@@ -58,6 +54,16 @@ public final class Main extends JavaPlugin implements Listener {
     public void inte(PlayerInteractEvent event) {
         if (event.getItem() == null || event.getItem().getType() == Material.AIR) return;
 
+        ItemMeta meta = event.getItem().getItemMeta();
+
+        if (meta == null) return;
+
+        List<String> lore = new ArrayList<>();
+        lore.add(ChatColor.GOLD + "we can even have lore");
+
+        meta.setLore(lore);
+        event.getItem().setItemMeta(meta);
+
         System.out.println(event.getItem());
     }
 
@@ -81,124 +87,4 @@ public final class Main extends JavaPlugin implements Listener {
     public static JavaPlugin getInstance() {
         return INSTANCE;
     }
-}
-
-class PacketHandler2 extends ChannelDuplexHandler {
-
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
-        // this thing like resets our items i guess
-        // so we can add an tag for mccenchants and like reset the item
-        if (packet.getClass().getSimpleName().equals(ServerboundSetCreativeModeSlotPacket.class.getSimpleName())) {
-            ServerboundSetCreativeModeSlotPacket slotPacket = (ServerboundSetCreativeModeSlotPacket) packet;
-            CraftItemStack craftItemStack = CraftItemStack.asCraftMirror(slotPacket.getItem());
-            ItemMeta meta = craftItemStack.getItemMeta();
-
-            if (meta != null) {
-                if (meta.getDisplayName().equals("packet item!")) {
-                    meta.setDisplayName(null);
-                    craftItemStack.setItemMeta(meta);
-                }
-            }
-            System.out.println(craftItemStack);
-        }
-        super.channelRead(ctx, packet);
-    }
-
-    // when crafting in survival i got not updated item i guess it is prob cuz that item did not have itemmeta for some reason
-    // i cant get that bug again
-    @Override
-    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-
-        String packet = msg.getClass().getSimpleName();
-
-        // this just like sets item in slot like when pickup or smth like that
-        if (packet.equals(ClientboundContainerSetSlotPacket.class.getSimpleName())) {
-
-            ClientboundContainerSetSlotPacket slotPacket = (ClientboundContainerSetSlotPacket) msg;
-            CraftItemStack craftItemStack = CraftItemStack.asCraftMirror(slotPacket.getItem());
-
-            if (craftItemStack.getType() != Material.AIR) {
-                System.out.println(craftItemStack);
-                ItemMeta meta = craftItemStack.getItemMeta();
-                if (meta != null) {
-                    meta.setDisplayName("packet item!");
-                    craftItemStack.setItemMeta(meta);
-                }
-            }
-
-            System.out.println("#0" + packet);
-        }
-
-        // this for content like in chests or anvils with grindstone
-        if (packet.equals(ClientboundContainerSetContentPacket.class.getSimpleName())) {
-
-            ClientboundContainerSetContentPacket contentPacket = (ClientboundContainerSetContentPacket) msg;
-
-            for (ItemStack itemStack : contentPacket.getItems())  { // if i press e items gets overwritten even on the server
-                CraftItemStack craftItemStack = CraftItemStack.asCraftMirror(itemStack);
-                ItemMeta meta = craftItemStack.getItemMeta();
-                if (craftItemStack.getType() == Material.AIR) continue;
-                if (meta == null) continue;
-
-                meta.setDisplayName("packet item!");
-                craftItemStack.setItemMeta(meta);
-
-                System.out.println(craftItemStack);
-            }
-
-            System.out.println("#1" + packet);
-
-        }
-
-        if (packet.equals(ClientboundContainerSetDataPacket.class.getSimpleName())) {
-            System.out.println("#2" + packet);
-        }
-
-        if (packet.equals(ClientboundContainerClosePacket.class.getSimpleName())) {
-            System.out.println("#3" + packet);
-        }
-
-        if (packet.equals(ClientboundMerchantOffersPacket.class.getSimpleName())) {
-            ClientboundMerchantOffersPacket offersPacket = (ClientboundMerchantOffersPacket) msg;
-
-            for (MerchantOffer offer : offersPacket.getOffers()) {
-
-                // System.out.println(offer.getBaseCostA()); idk if we should mod this if we mod this then getCostA if auto modified
-
-                CraftItemStack a = CraftItemStack.asCraftMirror(offer.getBaseCostA());
-                CraftItemStack b = CraftItemStack.asCraftMirror(offer.getCostB());
-                CraftItemStack c  = CraftItemStack.asCraftMirror(offer.getResult());
-
-                ItemMeta aa = a.getItemMeta();
-                ItemMeta cc = c.getItemMeta();
-
-                if (aa != null) {
-                    aa.setDisplayName("packet item!");
-                    a.setItemMeta(aa);
-                }
-
-                if (cc != null) {
-                    cc.setDisplayName("packet item!");
-                    c.setItemMeta(cc);
-                }
-
-                if (b.getType() != Material.AIR) {
-
-                    ItemMeta bb = b.getItemMeta();
-
-                    if (bb != null) {
-                        bb.setDisplayName("packet item!");
-                        b.setItemMeta(bb);
-                    }
-
-                }
-
-            }
-
-        }
-
-        super.write(ctx, msg, promise);
-    }
-
 }
