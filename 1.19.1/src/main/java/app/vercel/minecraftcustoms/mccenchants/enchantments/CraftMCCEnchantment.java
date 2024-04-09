@@ -31,11 +31,9 @@ public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<En
     }
 
     public CraftMCCEnchantment(NamespacedKey key, net.minecraft.world.item.enchantment.Enchantment handle) {
-        //super(CraftNamespacedKey.fromMinecraft(Objects.requireNonNull(BuiltInRegistries.ENCHANTMENT.getKey(target))));
         this.handle = handle;
         this.key = key;
         this.id = BuiltInRegistries.ENCHANTMENT.getId(handle);
-        //if (target instanceof NMSEnchantment) names.put(((NMSEnchantment) target).getKey(), ((NMSEnchantment) target).getName());
     }
 
     public net.minecraft.world.item.enchantment.Enchantment getHandle() {
@@ -60,16 +58,14 @@ public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<En
 
     @Override
     public @NotNull EnchantmentRarity getRarity() {
-
-        switch (handle.getRarity().getWeight()) {
-            case 10: return EnchantmentRarity.COMMON;
-            case 5: return EnchantmentRarity.UNCOMMON;
-            case 2: return EnchantmentRarity.RARE;
-            case 1: return EnchantmentRarity.VERY_RARE;
-            default: throw new IllegalArgumentException("Enchantment Rarity with weight doesn't exist: " + handle.getRarity().getWeight());
-
-        }
-
+        return switch (handle.getRarity().getWeight()) {
+            case 10 -> EnchantmentRarity.COMMON;
+            case 5 -> EnchantmentRarity.UNCOMMON;
+            case 2 -> EnchantmentRarity.RARE;
+            case 1 -> EnchantmentRarity.VERY_RARE;
+            default ->
+                    throw new IllegalArgumentException("Enchantment Rarity with weight doesn't exist: " + handle.getRarity().getWeight());
+        };
     }
 
     @Override
@@ -87,38 +83,23 @@ public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<En
     @Override
     public @NotNull EnchantmentTarget getItemTarget() {
 
-        switch(handle.category.ordinal()) {
-            case 0:
-                return EnchantmentTarget.ARMOR;
-            case 1:
-                return EnchantmentTarget.ARMOR_FEET;
-            case 2:
-                return EnchantmentTarget.ARMOR_LEGS;
-            case 3:
-                return EnchantmentTarget.ARMOR_TORSO;
-            case 4:
-                return EnchantmentTarget.ARMOR_HEAD;
-            case 5:
-                return EnchantmentTarget.WEAPON;
-            case 6:
-                return EnchantmentTarget.TOOL;
-            case 7:
-                return EnchantmentTarget.FISHING_ROD;
-            case 8:
-                return EnchantmentTarget.TRIDENT;
-            case 9:
-                return EnchantmentTarget.BREAKABLE;
-            case 10:
-                return EnchantmentTarget.BOW;
-            case 11:
-                return EnchantmentTarget.WEARABLE;
-            case 12:
-                return EnchantmentTarget.CROSSBOW;
-            case 13:
-                return EnchantmentTarget.VANISHABLE;
-            default:
-                throw new IncompatibleClassChangeError();
-        }
+        return switch (handle.category.ordinal()) {
+            case 0 -> EnchantmentTarget.ARMOR;
+            case 1 -> EnchantmentTarget.ARMOR_FEET;
+            case 2 -> EnchantmentTarget.ARMOR_LEGS;
+            case 3 -> EnchantmentTarget.ARMOR_TORSO;
+            case 4 -> EnchantmentTarget.ARMOR_HEAD;
+            case 5 -> EnchantmentTarget.WEAPON;
+            case 6 -> EnchantmentTarget.TOOL;
+            case 7 -> EnchantmentTarget.FISHING_ROD;
+            case 8 -> EnchantmentTarget.TRIDENT;
+            case 9 -> EnchantmentTarget.BREAKABLE;
+            case 10 -> EnchantmentTarget.BOW;
+            case 11 -> EnchantmentTarget.WEARABLE;
+            case 12 -> EnchantmentTarget.CROSSBOW;
+            case 13 -> EnchantmentTarget.VANISHABLE;
+            default -> throw new IncompatibleClassChangeError();
+        };
     }
 
     @Override

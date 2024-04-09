@@ -1,17 +1,18 @@
 package app.vercel.minecraftcustoms.mccenchants.packets;
 
-import app.vercel.minecraftcustoms.mccenchants.Main;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.world.item.trading.MerchantOffer;
+import org.apache.commons.lang.WordUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
@@ -24,21 +25,27 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class PacketHandler extends ChannelDuplexHandler {
 
-    private final static Field connectionField;
-    private static final Map<String, Integer> map = new HashMap<>();
+    private static Field connectionField;
+    //private static final Map<String, Integer> map = new HashMap<>();
 
-    static { // well cool and all but when we will try to add reflection and all we will want some error handling and like init function
+    public static void init() {
         try {
             connectionField = ServerCommonPacketListenerImpl.class.getField("c");
+            for (Player player : Bukkit.getOnlinePlayers()) addPlayer(player);
+
         } catch (NoSuchFieldException e) {
             throw new RuntimeException();
         }
+    }
+
+    public static void deinit() {
+        for (Player player : Bukkit.getOnlinePlayers()) removePlayer(player);
+
     }
 
     private static Connection getConnection(ServerCommonPacketListenerImpl packetListener) {
@@ -91,18 +98,15 @@ public class PacketHandler extends ChannelDuplexHandler {
                 enchantsToLore(offer.getResult());
             }
         }
-
-
-        if (map.containsKey(packet.getClass().getSimpleName())) {
-            int times = map.get(packet.getClass().getSimpleName());
-
-            map.put(packet.getClass().getSimpleName(), times + 1);
-
-        } else {
-            map.put(packet.getClass().getSimpleName(), 0);
-            System.out.println(packet.getClass().getSimpleName());
-        }
-
+//        if (map.containsKey(packet.getClass().getSimpleName())) {
+//            int times = map.get(packet.getClass().getSimpleName());
+//
+//            map.put(packet.getClass().getSimpleName(), times + 1);
+//
+//        } else {
+//            map.put(packet.getClass().getSimpleName(), 0);
+//            System.out.println(packet.getClass().getSimpleName());
+//        }
         super.write(context, packet, promise);
     }
 
@@ -160,7 +164,7 @@ public class PacketHandler extends ChannelDuplexHandler {
         if (lore == null) lore = new ArrayList<>();
 
         for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
-            newLore.add(entry.getKey().getKey() + " " + entry.getValue());
+            newLore.add(ChatColor.GRAY + WordUtils.capitalizeFully(entry.getKey().getKey().getKey().replace("_", " ")) + " " + entry.getValue());
         }
 
         newLore.addAll(lore);

@@ -1,10 +1,8 @@
 package app.vercel.minecraftcustoms.mccenchants.api.enchantments;
 
-import app.vercel.minecraftcustoms.mccenchants.CustomEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.Main;
 import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.enchantments.NMSEnchantment;
-import app.vercel.minecraftcustoms.mccenchants.utils.Utils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang.WordUtils;

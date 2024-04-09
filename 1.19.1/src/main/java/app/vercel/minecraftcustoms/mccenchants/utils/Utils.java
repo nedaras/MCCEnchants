@@ -1,16 +1,9 @@
 package app.vercel.minecraftcustoms.mccenchants.utils;
 
-import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
-import app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCEnchanting;
 import app.vercel.minecraftcustoms.mccenchants.managers.InventoryItemStack;
-import net.minecraft.nbt.CompoundTag;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
