@@ -1,6 +1,5 @@
 package app.vercel.minecraftcustoms.mccenchants.api.enchantments;
 
-import app.vercel.minecraftcustoms.mccenchants.Main;
 import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.enchantments.NMSEnchantment;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -22,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.*;
 
-public abstract class MCCEnchantment implements Keyed, Translatable {
+public abstract class MCCEnchantment implements Keyed, Translatable { // lets just extend BukkitEnchantment
 
     public static @NotNull org.bukkit.enchantments.Enchantment toEnchantment(@NotNull MCCEnchantment enchantment) {
         return new CraftEnchantment(enchantment.getKey(), ((CraftMCCEnchantment) enchantment).getHandle());
@@ -43,6 +42,7 @@ public abstract class MCCEnchantment implements Keyed, Translatable {
     }
 
     public @NotNull String getName() {
+        // TODO: fix it like color and fix names or mb import names from config
         return WordUtils.capitalizeFully(this.getKey().getKey().replace("_", " "));
 
     }
@@ -102,6 +102,7 @@ public abstract class MCCEnchantment implements Keyed, Translatable {
     }
 
     public static void registerEnchantment(@NotNull MCCEnchantment enchantment) {
+        // TODO: do ac check if like enchantment does not exist
         // TODO: we need to understand that are these l and m values cuz its weird to register like that
         setFieldValue(BuiltInRegistries.ENCHANTMENT, "l", false);
         setFieldValue(BuiltInRegistries.ENCHANTMENT, "m", new IdentityHashMap<>());
@@ -111,11 +112,6 @@ public abstract class MCCEnchantment implements Keyed, Translatable {
         net.minecraft.core.Registry.register(BuiltInRegistries.ENCHANTMENT, enchantment.getKey().toString(), nmsEnchantment);
 
         BuiltInRegistries.ENCHANTMENT.freeze();
-        Main.getInstance().getLogger().info(enchantment.getKey().toString());
-
-    }
-
-    public static void registerMinecraftEnchantments(JavaPlugin plugin) {
 
     }
 

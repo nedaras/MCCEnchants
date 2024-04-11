@@ -68,6 +68,7 @@ public class MCCEnchantingTable {
 
         List<MCCEnchantmentInstance> mccEnchantments = new ArrayList<>();
         List<EnchantmentInstance> enchantments = b(random, CraftItemStack.asNMSCopy(item), enchantingCost, false);
+        //List<EnchantmentInstance> enchantments = EnchantmentHelper.selectEnchantment(new RandomSourceWrapper(random), CraftItemStack.asNMSCopy(item), enchantingCost, false);
 
         if (item.getType() == Material.BOOK && enchantments.size() > 1) {
             enchantments.remove(random.nextInt(enchantments.size()));
@@ -177,7 +178,7 @@ public class MCCEnchantingTable {
                 } while(!var7.isDiscoverable());
             } while(!var7.canEnchant(var1) && !var5); // here
 
-            for(int var8 = var7.getMaxLevel(); var8 > var7.getMaxLevel() - 1; --var8) {
+            for(int var8 = var7.getMaxLevel(); var8 > var7.getMinLevel() - 1; --var8) {
                 if (var0 >= var7.getMinCost(var8) && var0 <= var7.getMaxCost(var8)) {
                     var3.add(new EnchantmentInstance(var7, var8));
                     break;

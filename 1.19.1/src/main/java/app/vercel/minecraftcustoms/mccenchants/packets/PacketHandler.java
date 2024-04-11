@@ -1,5 +1,6 @@
 package app.vercel.minecraftcustoms.mccenchants.packets;
 
+import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -10,7 +11,6 @@ import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.world.item.trading.MerchantOffer;
-import org.apache.commons.lang.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -164,7 +164,7 @@ public class PacketHandler extends ChannelDuplexHandler {
         if (lore == null) lore = new ArrayList<>();
 
         for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
-            newLore.add(ChatColor.GRAY + WordUtils.capitalizeFully(entry.getKey().getKey().getKey().replace("_", " ")) + " " + entry.getValue());
+            newLore.add(MCCEnchantment.toMCCEnchantment(entry.getKey()).getName() + " " + entry.getValue());
         }
 
         newLore.addAll(lore);
