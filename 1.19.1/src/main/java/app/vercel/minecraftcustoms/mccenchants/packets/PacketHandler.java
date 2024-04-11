@@ -1,6 +1,7 @@
 package app.vercel.minecraftcustoms.mccenchants.packets;
 
-import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
+import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
+import app.vercel.minecraftcustoms.mccenchants.utils.Utils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,7 +13,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.world.item.trading.MerchantOffer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
@@ -76,9 +76,27 @@ public class PacketHandler extends ChannelDuplexHandler {
         channel.pipeline().remove("mcc_enchants");
     }
 
+    // TODO: we need to see if all packets are reversed
     @Override
     public void channelRead(ChannelHandlerContext context, Object packet) throws Exception {
         if (packet instanceof ServerboundSetCreativeModeSlotPacket slotPacket) reverseItemStack(slotPacket.getItem());
+        if (packet instanceof ServerboundContainerClickPacket clickPacket) {
+            reverseItemStack(clickPacket.getCarriedItem());
+            clickPacket.getChangedSlots().forEach((i, item) -> {
+                reverseItemStack(item);
+            });
+        }
+/*
+        if (map.containsKey(packet.getClass().getSimpleName())) {
+            int times = map.get(packet.getClass().getSimpleName());
+
+            map.put(packet.getClass().getSimpleName(), times + 1);
+
+        } else {
+            map.put(packet.getClass().getSimpleName(), 0);
+            System.out.println(packet.getClass().getSimpleName());
+        }
+*/
         super.channelRead(context, packet);
     }
 
@@ -98,15 +116,17 @@ public class PacketHandler extends ChannelDuplexHandler {
                 enchantsToLore(offer.getResult());
             }
         }
-//        if (map.containsKey(packet.getClass().getSimpleName())) {
-//            int times = map.get(packet.getClass().getSimpleName());
-//
-//            map.put(packet.getClass().getSimpleName(), times + 1);
-//
-//        } else {
-//            map.put(packet.getClass().getSimpleName(), 0);
-//            System.out.println(packet.getClass().getSimpleName());
-//        }
+/*
+        if (map.containsKey(packet.getClass().getSimpleName())) {
+            int times = map.get(packet.getClass().getSimpleName());
+
+            map.put(packet.getClass().getSimpleName(), times + 1);
+
+        } else {
+            map.put(packet.getClass().getSimpleName(), 0);
+            System.out.println(packet.getClass().getSimpleName());
+        }
+*/
         super.write(context, packet, promise);
     }
 
@@ -156,7 +176,7 @@ public class PacketHandler extends ChannelDuplexHandler {
             CompoundTag tag = minecraftItemStack.getOrCreateTag();
             tag.putShort("MCCEnchants", (short) 0);
             return;
-        };
+        }
 
         List<String> lore = meta.getLore();
         List<String> newLore = new ArrayList<>();
@@ -164,7 +184,7 @@ public class PacketHandler extends ChannelDuplexHandler {
         if (lore == null) lore = new ArrayList<>();
 
         for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
-            newLore.add(MCCEnchantment.toMCCEnchantment(entry.getKey()).getName() + " " + entry.getValue());
+            newLore.add(CraftMCCEnchantment.bukkitToCustoms(entry.getKey()).getName() + " " + Utils.toRomeNumber(entry.getValue()));
         }
 
         newLore.addAll(lore);

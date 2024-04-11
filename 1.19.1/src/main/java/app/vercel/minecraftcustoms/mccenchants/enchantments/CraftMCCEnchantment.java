@@ -2,12 +2,12 @@ package app.vercel.minecraftcustoms.mccenchants.enchantments;
 
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.EnchantmentRarity;
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.craftbukkit.v1_20_R3.CraftRegistry;
+import org.bukkit.craftbukkit.v1_20_R3.enchantments.CraftEnchantment;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R3.util.Handleable;
 import org.bukkit.enchantments.EnchantmentTarget;
@@ -16,24 +16,29 @@ import org.jetbrains.annotations.NotNull;
 
 public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<Enchantment> {
 
-    // TODO: would it not be better if we extended Enchantment and CraftEnchantment from bukkit, we're kinda the same just better
     private final NamespacedKey key;
     private final Enchantment handle;
-    private final int id;
 
-    public static MCCEnchantment minecraftToBukkit(Enchantment minecraft) {
+    public static MCCEnchantment minecraftToCustoms(@NotNull Enchantment minecraft) {
         org.bukkit.enchantments.Enchantment enchantment = CraftRegistry.minecraftToBukkit(minecraft, Registries.ENCHANTMENT, Registry.ENCHANTMENT);
-        return MCCEnchantment.toMCCEnchantment(enchantment);
+        return new CraftMCCEnchantment(enchantment.getKey(), minecraft);
     }
 
-    public static Enchantment bukkitToMinecraft(MCCEnchantment bukkit) {
+    public static Enchantment customsToMinecraft(@NotNull MCCEnchantment bukkit) {
         return CraftRegistry.bukkitToMinecraft(bukkit);
+    }
+
+    public static org.bukkit.enchantments.Enchantment customsToBukkit(@NotNull MCCEnchantment enchantment) {
+        return new CraftEnchantment(enchantment.getKey(), ((CraftMCCEnchantment) enchantment).getHandle());
+    }
+
+    public static MCCEnchantment bukkitToCustoms(@NotNull org.bukkit.enchantments.Enchantment enchantment) {
+        return new CraftMCCEnchantment(enchantment.getKey(), ((CraftEnchantment) enchantment).getHandle());
     }
 
     public CraftMCCEnchantment(NamespacedKey key, net.minecraft.world.item.enchantment.Enchantment handle) {
         this.handle = handle;
         this.key = key;
-        this.id = BuiltInRegistries.ENCHANTMENT.getId(handle);
     }
 
     public net.minecraft.world.item.enchantment.Enchantment getHandle() {
@@ -148,7 +153,7 @@ public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<En
         if (this == other) {
             return true;
         } else {
-            return !(other instanceof CraftMCCEnchantment) ? false : this.getKey().equals(((MCCEnchantment) other).getKey());
+            return other instanceof CraftMCCEnchantment && this.getKey().equals(((MCCEnchantment) other).getKey());
         }
     }
    public int hashCode() {

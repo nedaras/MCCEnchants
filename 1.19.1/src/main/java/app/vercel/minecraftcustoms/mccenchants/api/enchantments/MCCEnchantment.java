@@ -9,11 +9,9 @@ import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.Translatable;
-import org.bukkit.craftbukkit.v1_20_R3.enchantments.CraftEnchantment;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,15 +19,15 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.*;
 
-public abstract class MCCEnchantment implements Keyed, Translatable { // lets just extend BukkitEnchantment
+public abstract class MCCEnchantment implements Keyed, Translatable {
 
-    public static @NotNull org.bukkit.enchantments.Enchantment toEnchantment(@NotNull MCCEnchantment enchantment) {
-        return new CraftEnchantment(enchantment.getKey(), ((CraftMCCEnchantment) enchantment).getHandle());
-    }
+    //public static @NotNull org.bukkit.enchantments.Enchantment toEnchantment(@NotNull MCCEnchantment enchantment) {
+        //return new CraftEnchantment(enchantment.getKey(), ((CraftMCCEnchantment) enchantment).getHandle());
+    //}
 
-    public static @NotNull MCCEnchantment toMCCEnchantment(@NotNull org.bukkit.enchantments.Enchantment enchantment) {
-        return new CraftMCCEnchantment(enchantment.getKey(), ((CraftEnchantment) enchantment).getHandle());
-    }
+    //public static @NotNull MCCEnchantment toMCCEnchantment(@NotNull org.bukkit.enchantments.Enchantment enchantment) {
+        //return new CraftMCCEnchantment(enchantment.getKey(), ((CraftEnchantment) enchantment).getHandle());
+    //}
 
     public MCCEnchantment() {}
 
@@ -38,7 +36,7 @@ public abstract class MCCEnchantment implements Keyed, Translatable { // lets ju
         NamespacedKey namespacedKey = NamespacedKey.minecraft(key);
         Enchantment enchantment = Registry.ENCHANTMENT.get(namespacedKey);
         Preconditions.checkNotNull(enchantment, "No Enchantment found for %s. This is a bug.", namespacedKey);
-        return toMCCEnchantment(enchantment);
+        return CraftMCCEnchantment.bukkitToCustoms(enchantment);
     }
 
     public @NotNull String getName() {
@@ -119,7 +117,9 @@ public abstract class MCCEnchantment implements Keyed, Translatable { // lets ju
     @Contract("null -> null")
     @Nullable
     public static MCCEnchantment getByKey(@Nullable NamespacedKey key) {
-        return key == null ? null : toMCCEnchantment(Registry.ENCHANTMENT.get(key));
+        if (key == null) return null;
+        Enchantment enchantment =  Registry.ENCHANTMENT.get(key);
+        return enchantment == null ? null : CraftMCCEnchantment.bukkitToCustoms(enchantment);
     }
 
     /** @deprecated */
@@ -144,7 +144,7 @@ public abstract class MCCEnchantment implements Keyed, Translatable { // lets ju
         NamespacedKey namespacedKey = NamespacedKey.minecraft(key);
         org.bukkit.enchantments.Enchantment enchantment = org.bukkit.Registry.ENCHANTMENT.get(namespacedKey);
         Preconditions.checkNotNull(enchantment, "No Enchantment found for %s. This is a bug.", namespacedKey);
-        return toMCCEnchantment(enchantment);
+        return CraftMCCEnchantment.bukkitToCustoms(enchantment);
     }
 
 

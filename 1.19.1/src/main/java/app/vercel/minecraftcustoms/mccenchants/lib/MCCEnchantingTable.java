@@ -1,8 +1,5 @@
 package app.vercel.minecraftcustoms.mccenchants.lib;
 
-import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
-import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
-import app.vercel.minecraftcustoms.mccenchants.utils.MCCEnchantmentInstance;
 import com.google.common.collect.Lists;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -21,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R3.enchantments.CraftEnchantment;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R3.util.RandomSourceWrapper;
@@ -33,11 +31,12 @@ import java.util.*;
 
 public class MCCEnchantingTable {
 
+    // TODO: books ye
     public static @NotNull ItemStack enchantItem(@NotNull Random random, int enchantingCost, @NotNull ItemStack item) {
         item = item.clone();
         item.setAmount(1);
 
-        List<MCCEnchantmentInstance> enchantments = getEnchantments(random, enchantingCost, item);
+        List<EnchantmentInstance> enchantments = getEnchantments(random, enchantingCost, item);
         //if (item.getType() == Material.BOOK) item.setType(Material.ENCHANTED_BOOK);
 
         if (item.getType() == Material.BOOK) {
@@ -45,10 +44,10 @@ public class MCCEnchantingTable {
             return item;
         }
 
-        for (MCCEnchantmentInstance instance : enchantments) {
+        for (EnchantmentInstance instance : enchantments) {
             // We dont rly need to use MCCenchantment everywhere
             //app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCEnchanting.setEnchantment(item, instance.getEnchantment(), instance.getLevel());
-            item.addUnsafeEnchantment(MCCEnchantment.toEnchantment(instance.getEnchantment()), instance.getLevel());
+            item.addUnsafeEnchantment(CraftEnchantment.minecraftToBukkit(instance.enchantment), instance.level);
 
         }
 
@@ -64,23 +63,14 @@ public class MCCEnchantingTable {
 
     }
 
-    public static List<MCCEnchantmentInstance> getEnchantments(@NotNull Random random, int enchantingCost, @NotNull ItemStack item) {
-
-        List<MCCEnchantmentInstance> mccEnchantments = new ArrayList<>();
+    public static List<EnchantmentInstance> getEnchantments(@NotNull Random random, int enchantingCost, @NotNull ItemStack item) {
         List<EnchantmentInstance> enchantments = b(random, CraftItemStack.asNMSCopy(item), enchantingCost, false);
-        //List<EnchantmentInstance> enchantments = EnchantmentHelper.selectEnchantment(new RandomSourceWrapper(random), CraftItemStack.asNMSCopy(item), enchantingCost, false);
 
         if (item.getType() == Material.BOOK && enchantments.size() > 1) {
             enchantments.remove(random.nextInt(enchantments.size()));
         }
 
-        for (EnchantmentInstance enchantment : enchantments) {
-            MCCEnchantment mccEnchantment = CraftMCCEnchantment.minecraftToBukkit(enchantment.enchantment);
-            mccEnchantments.add(new MCCEnchantmentInstance(mccEnchantment, enchantment.level));
-        }
-
-        return mccEnchantments;
-
+        return enchantments;
     }
 
     public static int getEnchantingCost(@NotNull Random random, int slot, int bookshelves, @NotNull ItemStack item) {

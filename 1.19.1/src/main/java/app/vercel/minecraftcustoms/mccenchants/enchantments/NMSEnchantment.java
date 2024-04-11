@@ -82,7 +82,7 @@ public class NMSEnchantment extends Enchantment {
 
     @Override
     public boolean checkCompatibility(Enchantment other) {
-        CraftMCCEnchantment enchantment = (CraftMCCEnchantment) CraftMCCEnchantment.minecraftToBukkit(other);
+        CraftMCCEnchantment enchantment = (CraftMCCEnchantment) CraftMCCEnchantment.minecraftToCustoms(other);
         return !enchantment.equals(this.enchantment) && !this.enchantment.conflictsWith(enchantment);
 
     }

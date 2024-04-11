@@ -1,9 +1,11 @@
 package app.vercel.minecraftcustoms.mccenchants.managers;
 
 import app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCInventory;
+import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.lib.MCCEnchantingTable;
-import app.vercel.minecraftcustoms.mccenchants.utils.MCCEnchantmentInstance;
 import app.vercel.minecraftcustoms.mccenchants.utils.Utils;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -165,7 +167,7 @@ public final class EnchantingTable extends CorrespondingInventory {
             int cost = MCCEnchantingTable.getEnchantingCost(random, enchantingSlot, bookshelves, inputItem);
             if (cost < enchantingSlot) continue;
 
-            MCCEnchantmentInstance enchantment = getFirstEnchant(random, inputItem, cost);
+            EnchantmentInstance enchantment = getFirstEnchant(random, inputItem, cost);
             if (enchantment == null) continue;
 
             InventoryItemStack inventoryItem = this.getSavedItemsWithFunction("enchant_item", "enchant_" + enchantingSlot);
@@ -175,7 +177,7 @@ public final class EnchantingTable extends CorrespondingInventory {
 
             placeholders.put("level", cost + "");
             // TODO: rome number yo
-            placeholders.put("enchantment", enchantment.getEnchantment().getName() + " " + enchantment.getLevel());
+            placeholders.put("enchantment", CraftMCCEnchantment.minecraftToCustoms(enchantment.enchantment).getName() + " " + Utils.toRomeNumber(enchantment.level));
 
             if (player.getGameMode() != GameMode.CREATIVE && player.getLevel() < cost) {
 
@@ -219,9 +221,9 @@ public final class EnchantingTable extends CorrespondingInventory {
 
     }
 
-    private @Nullable MCCEnchantmentInstance getFirstEnchant(@NotNull Random random, @NotNull ItemStack item, int cost) {
+    private @Nullable EnchantmentInstance getFirstEnchant(@NotNull Random random, @NotNull ItemStack item, int cost) {
 
-        List<MCCEnchantmentInstance> enchantments = MCCEnchantingTable.getEnchantments(random, cost, item);
+        List<EnchantmentInstance> enchantments = MCCEnchantingTable.getEnchantments(random, cost, item);
         return enchantments.isEmpty() ? null : enchantments.get(0);
 
     }
