@@ -14,7 +14,6 @@ public final class Main extends JavaPlugin {
     public void onEnable() {
 
         INSTANCE = this;
-        // VISUAL BUG WHEN IN ANVIM COMBINING SAME CUSTOM ENCHANTMENTS
         // TODO: we need to rewrite the enchantment table manager cuz code in there is just too complicated
         //Version.setVersion(this); // we will use reflection
 

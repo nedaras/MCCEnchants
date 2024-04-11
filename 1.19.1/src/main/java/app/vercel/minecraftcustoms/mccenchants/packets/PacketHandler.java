@@ -20,6 +20,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
@@ -76,7 +77,7 @@ public class PacketHandler extends ChannelDuplexHandler {
         channel.pipeline().remove("mcc_enchants");
     }
 
-    // TODO: we need to see if all packets are reversed
+    // TODO: we need to see if all packets are reversed anvil bug again with books now
     @Override
     public void channelRead(ChannelHandlerContext context, Object packet) throws Exception {
         if (packet instanceof ServerboundSetCreativeModeSlotPacket slotPacket) reverseItemStack(slotPacket.getItem());
@@ -100,8 +101,6 @@ public class PacketHandler extends ChannelDuplexHandler {
         super.channelRead(context, packet);
     }
 
-    // if we in inventory click item then exit the inventory and put item in main hand it will not update
-    // idk why
     @Override
     public void write(ChannelHandlerContext context, Object packet, ChannelPromise promise) throws Exception {
         if (packet instanceof ClientboundContainerSetSlotPacket slotPacket) enchantsToLore(slotPacket.getItem());
@@ -144,7 +143,7 @@ public class PacketHandler extends ChannelDuplexHandler {
         ItemMeta meta = itemStack.getItemMeta();
 
         if (meta == null) return;
-        if (!meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) return;
+        if (!hasHideFlag(meta)) return;
 
         List<String> lore = meta.getLore();
         List<String> newLore = new ArrayList<>();
@@ -158,8 +157,8 @@ public class PacketHandler extends ChannelDuplexHandler {
 
         if (lore.size() == newLore.size()) return;
 
-        meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
         meta.setLore(newLore);
+        removeHideFlag(meta);
 
         itemStack.setItemMeta(meta);
 
@@ -170,9 +169,9 @@ public class PacketHandler extends ChannelDuplexHandler {
         ItemMeta meta = itemStack.getItemMeta();
 
         if (itemStack.getType() == Material.AIR) return;
-        if (itemStack.getEnchantments().isEmpty()) return;
         if (meta == null) return;
-        if (meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS)) {
+        if (getEnchantments(itemStack, meta).isEmpty()) return;
+        if (hasHideFlag(meta)) {
             CompoundTag tag = minecraftItemStack.getOrCreateTag();
             tag.putShort("MCCEnchants", (short) 0);
             return;
@@ -183,19 +182,46 @@ public class PacketHandler extends ChannelDuplexHandler {
 
         if (lore == null) lore = new ArrayList<>();
 
-        for (Map.Entry<Enchantment, Integer> entry : itemStack.getEnchantments().entrySet()) {
+        for (Map.Entry<Enchantment, Integer> entry : getEnchantments(itemStack, meta).entrySet()) {
             newLore.add(CraftMCCEnchantment.bukkitToCustoms(entry.getKey()).getName() + " " + Utils.toRomeNumber(entry.getValue()));
         }
 
         newLore.addAll(lore);
 
         meta.setLore(newLore);
-        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        addHideFlag(meta);
 
         itemStack.setItemMeta(meta);
 
         CompoundTag tag = minecraftItemStack.getOrCreateTag();
-        tag.putShort("MCCEnchants", (short) itemStack.getEnchantments().size());
+        tag.putShort("MCCEnchants", (short) getEnchantments(itemStack, meta).size());
 
     }
+
+    private static Map<Enchantment, Integer> getEnchantments(ItemStack itemStack, ItemMeta meta) {
+        if (meta instanceof EnchantmentStorageMeta storageMeta) return storageMeta.getStoredEnchants();
+        return itemStack.getEnchantments();
+    }
+
+    private static boolean hasHideFlag(ItemMeta meta) {
+        if (meta instanceof EnchantmentStorageMeta) return meta.hasItemFlag(ItemFlag.HIDE_POTION_EFFECTS);
+        return meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS);
+    }
+
+    private static void addHideFlag(ItemMeta meta) {
+        if (meta instanceof EnchantmentStorageMeta) {
+            meta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+            return;
+        }
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+    }
+
+    private static void removeHideFlag(ItemMeta meta) {
+        if (meta instanceof EnchantmentStorageMeta) {
+            meta.removeItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
+            return;
+        }
+        meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
+    }
+
 }

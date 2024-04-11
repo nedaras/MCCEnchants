@@ -25,6 +25,8 @@ import org.bukkit.craftbukkit.v1_20_R3.util.RandomSourceWrapper;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -37,16 +39,26 @@ public class MCCEnchantingTable {
         item.setAmount(1);
 
         List<EnchantmentInstance> enchantments = getEnchantments(random, enchantingCost, item);
-        //if (item.getType() == Material.BOOK) item.setType(Material.ENCHANTED_BOOK);
 
         if (item.getType() == Material.BOOK) {
-            System.out.println("fuck");
+            item.setType(Material.ENCHANTED_BOOK);
+
+            ItemMeta meta = item.getItemMeta();
+            EnchantmentStorageMeta storageMeta = (EnchantmentStorageMeta) meta;
+
+            if (meta == null) return item;
+
+            for (EnchantmentInstance instance : enchantments) {
+                storageMeta.addStoredEnchant(CraftEnchantment.minecraftToBukkit(instance.enchantment), instance.level, true);
+
+            }
+
+            item.setItemMeta(storageMeta);
+
             return item;
         }
 
         for (EnchantmentInstance instance : enchantments) {
-            // We dont rly need to use MCCenchantment everywhere
-            //app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCEnchanting.setEnchantment(item, instance.getEnchantment(), instance.getLevel());
             item.addUnsafeEnchantment(CraftEnchantment.minecraftToBukkit(instance.enchantment), instance.level);
 
         }
