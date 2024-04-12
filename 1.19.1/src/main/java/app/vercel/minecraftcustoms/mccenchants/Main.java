@@ -1,6 +1,7 @@
 package app.vercel.minecraftcustoms.mccenchants;
 
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
+import app.vercel.minecraftcustoms.mccenchants.events.InventoryListener;
 import app.vercel.minecraftcustoms.mccenchants.events.PlayerListener;
 import app.vercel.minecraftcustoms.mccenchants.managers.InventoryManager;
 import app.vercel.minecraftcustoms.mccenchants.packets.PacketHandler;
@@ -19,10 +20,13 @@ public final class Main extends JavaPlugin {
 
         MCCEnchantment.registerEnchantment(new CustomEnchantment());
         // TODO: make like config to decide if this inv should be enabled
-        InventoryManager.registerInventories(this);
+        //InventoryManager.registerInventories(this);
 
         PacketHandler.init();
+
         this.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        this.getServer().getPluginManager().registerEvents(new InventoryListener(), this);
+
     }
 
 

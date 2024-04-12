@@ -2,6 +2,7 @@ package app.vercel.minecraftcustoms.mccenchants.packets;
 
 import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.utils.Utils;
+import com.mojang.datafixers.util.Pair;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -11,6 +12,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.trading.MerchantOffer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -101,7 +103,7 @@ public class PacketHandler extends ChannelDuplexHandler {
         super.channelRead(context, packet);
     }
 
-    @Override
+    @Override // when picking up lots of items shit happends some invisible items on creative
     public void write(ChannelHandlerContext context, Object packet, ChannelPromise promise) throws Exception {
         if (packet instanceof ClientboundContainerSetSlotPacket slotPacket) enchantsToLore(slotPacket.getItem());
         if (packet instanceof ClientboundContainerSetContentPacket contentPacket) {
@@ -113,6 +115,12 @@ public class PacketHandler extends ChannelDuplexHandler {
                 enchantsToLore(offer.getBaseCostA());
                 enchantsToLore(offer.getCostB());
                 enchantsToLore(offer.getResult());
+            }
+        }
+        //Set Equipment
+        if (packet instanceof ClientboundSetEquipmentPacket equipmentPacket) {
+            for (Pair<EquipmentSlot, net.minecraft.world.item.ItemStack> pair : equipmentPacket.getSlots()) {
+                enchantsToLore(pair.getSecond());
             }
         }
 /*

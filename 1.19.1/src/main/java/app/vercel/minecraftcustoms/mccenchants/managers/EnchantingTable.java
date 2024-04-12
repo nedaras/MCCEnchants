@@ -4,7 +4,6 @@ import app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCInventory;
 import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.lib.MCCEnchantingTable;
 import app.vercel.minecraftcustoms.mccenchants.utils.Utils;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -105,6 +104,8 @@ public final class EnchantingTable extends CorrespondingInventory {
             return;
 
         }
+
+        System.out.println("alio");
 
         Map<Integer, Integer> enchantableSlots = storedEnchantableSlots.get(player.getUniqueId());
 
