@@ -1,0 +1,12 @@
+menu_title: 'Enchantment Table'
+size:  27
+input_slot: 12
+lapis_slot: 14
+
+outputs:
+  slots: [ 29, 31, 33 ]
+  material: EXPERIENCE_BOTTLE
+  display_name: '&ahello world'
+  lore:
+    - 'hello'
+    - 'world'
