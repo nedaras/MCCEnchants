@@ -3,8 +3,18 @@ size:  27
 input_slot: 12
 lapis_slot: 14
 
+items:
+  'fill':
+    display_name: '&r'
+    material: YELLOW_STAINED_GLASS_PANE
+    slots:
+      - 0-9
+
 outputs:
-  slots: [ 29, 31, 33 ]
+  slots:
+    - 29
+    - 31
+    - 33
   material: EXPERIENCE_BOTTLE
   display_name: '&ahello world'
   lore:

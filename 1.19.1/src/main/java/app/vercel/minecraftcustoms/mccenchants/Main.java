@@ -25,7 +25,7 @@ public final class Main extends JavaPlugin {
         PacketHandler.init();
 
         this.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-        this.getServer().getPluginManager().registerEvents(new InventoryListener(), this);
+        this.getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
 
     }
 
