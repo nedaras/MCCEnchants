@@ -1,13 +1,17 @@
 package app.vercel.minecraftcustoms.mccenchants.configs;
 
+import app.vercel.minecraftcustoms.mccenchants.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class MenuConfig {
 
@@ -26,6 +31,7 @@ public class MenuConfig {
     private int size;
     private int inputSlot;
     private int lapisSlot;
+    private final Set<@NotNull Integer> outputSlots = new TreeSet<>();
 
 
     private static class ContentItem {
@@ -53,6 +59,8 @@ public class MenuConfig {
     }
 
     public void reload() {
+        outputSlots.clear();
+
         // TODO: check if size is even logical
         content = new ContentItem[config.getConfig().getInt("size")];
 
@@ -68,6 +76,9 @@ public class MenuConfig {
             ItemStack[] states = getStates("items." + key);
 
             for (Integer i : getSlots("items." + key)) {
+                if (states != null && states[0] != null) {
+                    outputSlots.add(i);
+                }
                 content[i] = new ContentItem(itemStack, states);
             }
         }
@@ -85,12 +96,40 @@ public class MenuConfig {
         return inventory;
     }
 
+    public @NotNull ItemStack[] getContents() {
+        return getContents(null);
+    }
+
+    public @NotNull ItemStack[] getContents(@Nullable Integer state) {
+        ItemStack[] result = new ItemStack[content.length];
+
+        for (int i = 0; i < content.length; i++) {
+            if (content[i] == null) continue;
+            if (state == null || content[i].states == null) {
+                result[i] = content[i].itemStack;
+                continue;
+            }
+            result[i] = content[i].states[state];
+        }
+
+        return result;
+
+    }
+
+    public @NotNull String getTitle() {
+        return title;
+    }
+
     public int getInputSlot() {
         return inputSlot;
     }
 
     public int getLapisSlot() {
         return lapisSlot;
+    }
+
+    public Set<@NotNull Integer> getOutputSlots() {
+        return outputSlots;
     }
 
     private ItemStack[] getStates(String path) {
