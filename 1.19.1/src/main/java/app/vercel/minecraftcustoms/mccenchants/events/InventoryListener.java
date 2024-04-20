@@ -1,22 +1,20 @@
 package app.vercel.minecraftcustoms.mccenchants.events;
 
 import app.vercel.minecraftcustoms.mccenchants.Main;
-import app.vercel.minecraftcustoms.mccenchants.configs.YamlConfig;
+import app.vercel.minecraftcustoms.mccenchants.configs.MenuConfig;
 import app.vercel.minecraftcustoms.mccenchants.lib.MCCEnchantingTable;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +23,7 @@ import java.util.*;
 public class InventoryListener implements Listener {
 
 
+    // TODO: someday add PAPI support
     // TODO: using names to identify and inventory is nono
     // TODO: add a check if event is already canceled
     // TODO: check a way to like make slots not interactive
@@ -32,102 +31,14 @@ public class InventoryListener implements Listener {
 
     // first integer is task second is how many books are around
     private static final Map<UUID, Data> playerData = new HashMap<>();
-    private static YamlConfig config;
+    private final MenuConfig config;
 
-    private static ItemStack[] content;
-    private static int inputSlot;
-    private static int lapisSlot;
-
-    public InventoryListener(JavaPlugin plugin) {
-        config = new YamlConfig(plugin, "menu");
-
-        content = new ItemStack[config.getConfig().getInt("size", 9)];
-
-        // TODO: throw errors and stuff cuz like if slots are equal or what if its out of bounds and all
-        inputSlot = config.getConfig().getInt("input_slot");
-        lapisSlot = config.getConfig().getInt("lapis_slot");
-
-
-        // no error handling
-        for (String key : config.getConfig().getConfigurationSection("items").getKeys(false)) {
-            ItemStack itemStack = getItemStack("items." + key);
-            for (Integer i : getSlots("items." + key)) {
-                content[i] = itemStack;
-            }
-        }
-
-        content[inputSlot] = null;
-        content[lapisSlot] = null;
-
+    public InventoryListener(MenuConfig config) {
+        this.config = config;
     }
 
-    // TODO: debug errors and move all of this shit out of this
-    private @NotNull ItemStack getItemStack(@NotNull String path) {
-        String material = config.getConfig().getString(path + ".material", "STONE");
 
-        try {
-
-            ItemStack itemStack = new ItemStack(Material.valueOf(material));
-            ItemMeta meta = itemStack.getItemMeta();
-
-            if (meta == null) {
-                // print err or sum
-                return itemStack;
-            }
-
-            String displayName = config.getConfig().getString(path + ".display_name");
-            List<String> lore = config.getConfig().getStringList(path + ".lore");
-
-            if (displayName != null) meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', displayName));
-            meta.setLore(lore.stream().map((line) -> ChatColor.translateAlternateColorCodes('&', line)).toList());
-
-            itemStack.setItemMeta(meta);
-
-            return itemStack;
-
-        } catch (IllegalArgumentException __) {
-            // would be cool thing to like set error message in lore.
-            return new ItemStack(Material.STONE);
-
-        }
-    }
-
-    private @NotNull Set<Integer> getSlots(@NotNull String path) {
-
-        Set<Integer> slots = new HashSet<>();
-
-        if (config.getConfig().contains(path + ".slot")) slots.add(config.getConfig().getInt(path + ".slot"));
-        for (String i : config.getConfig().getStringList(path + ".slots")) {
-
-            try {
-                slots.add(Integer.parseInt(i));
-            } catch (IllegalArgumentException __) {
-                try {
-                    String[] range = i.split("-");
-                    // TODO: throw error or sum
-                    if (range.length != 2) continue;
-
-                    int a = Integer.parseInt(range[0]);
-                    int b = Integer.parseInt(range[1]);
-
-                    // throw error
-                    if (a > b) continue;
-
-                    for (int j = a; j <= b; j++) {
-                        slots.add(j);
-                    }
-
-                } catch (IllegalArgumentException ___) {
-                    return slots;
-
-                }
-            }
-        }
-
-        return slots;
-
-    }
-
+    // TODO: check if clieked on invalid slit if it is event set cancel early cuz if not we can like swap simular items
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getClickedInventory() == null) return;
@@ -221,7 +132,7 @@ public class InventoryListener implements Listener {
         }, 0).getTaskId();
     }
 
-    // this is bad rl bad
+    // how we will check placeholders? we need to pass placeholder too
     private boolean invalidInventory(Inventory inventory) {
         return false;
     }
@@ -281,25 +192,17 @@ public class InventoryListener implements Listener {
     }
 
     @EventHandler
-    public void onInventoryMoveItem(InventoryMoveItemEvent event) {
-        //System.out.println(event.getClass().getSimpleName());
-
-    }
-
-    @EventHandler
-    public void onInventoryOpen(PlayerInteractEvent event) {
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getClickedBlock() == null) return;
         if (event.getClickedBlock().getType() != Material.ENCHANTING_TABLE) return;
 
         boolean hasItemInHand = event.getPlayer().getInventory().getItemInMainHand().getType() != Material.AIR || event.getPlayer().getInventory().getItemInOffHand().getType() != Material.AIR;
         if (event.getPlayer().isSneaking() && hasItemInHand) return;
 
-        Inventory inventory =  Bukkit.createInventory(event.getPlayer(), content.length, "Enchanting Table");
-        inventory.setContents(content);
-
         playerData.put(event.getPlayer().getUniqueId(), new Data(MCCEnchantingTable.getSurroundingBookshelves(event.getClickedBlock())));
 
-        event.getPlayer().openInventory(inventory);
+        event.getPlayer().openInventory(config.getInventory(event.getPlayer()));
         event.setCancelled(true);
     }
 
@@ -318,7 +221,8 @@ public class InventoryListener implements Listener {
 
 }
 
-class Data { public @Nullable Integer taskId;
+class Data {
+    public @Nullable Integer taskId;
     public int bookshelves;
 
     Data(int bookshelves) {

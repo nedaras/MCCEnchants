@@ -1,9 +1,9 @@
 package app.vercel.minecraftcustoms.mccenchants;
 
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
+import app.vercel.minecraftcustoms.mccenchants.configs.MenuConfig;
 import app.vercel.minecraftcustoms.mccenchants.events.InventoryListener;
 import app.vercel.minecraftcustoms.mccenchants.events.PlayerListener;
-import app.vercel.minecraftcustoms.mccenchants.managers.InventoryManager;
 import app.vercel.minecraftcustoms.mccenchants.packets.PacketHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,8 +24,10 @@ public final class Main extends JavaPlugin {
 
         PacketHandler.init();
 
+        MenuConfig menuConfig = new MenuConfig(this);
+
         this.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-        this.getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
+        this.getServer().getPluginManager().registerEvents(new InventoryListener(menuConfig), this);
 
     }
 
