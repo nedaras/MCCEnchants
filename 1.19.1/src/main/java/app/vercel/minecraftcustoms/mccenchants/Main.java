@@ -1,6 +1,7 @@
 package app.vercel.minecraftcustoms.mccenchants;
 
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
+import app.vercel.minecraftcustoms.mccenchants.commands.Commands;
 import app.vercel.minecraftcustoms.mccenchants.configs.MenuConfig;
 import app.vercel.minecraftcustoms.mccenchants.events.InventoryListener;
 import app.vercel.minecraftcustoms.mccenchants.events.PlayerListener;
@@ -28,6 +29,8 @@ public final class Main extends JavaPlugin {
 
         this.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
         this.getServer().getPluginManager().registerEvents(new InventoryListener(menuConfig), this);
+
+        this.getCommand("mccenchants").setExecutor(new Commands(menuConfig));
 
     }
 

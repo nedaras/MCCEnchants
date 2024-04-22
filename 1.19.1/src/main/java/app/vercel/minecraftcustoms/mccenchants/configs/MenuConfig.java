@@ -1,48 +1,46 @@
 package app.vercel.minecraftcustoms.mccenchants.configs;
 
-import app.vercel.minecraftcustoms.mccenchants.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class MenuConfig {
 
     private final YamlConfig config;
-
     private ContentItem[] content;
-
-    private @NotNull String title;
+    private String title;
     private int size;
     private int inputSlot;
     private int lapisSlot;
     private final Set<@NotNull Integer> outputSlots = new TreeSet<>();
 
+    enum STATE {
+        DEFAULT(-1),
+        ENCHANT_ITEMS(0),
+        MISSING_LEVEL(1);
+
+        public final int state;
+
+        STATE(int state) {
+            this.state = state;
+
+        }
+
+    }
 
     private static class ContentItem {
         final @NotNull ItemStack itemStack;
         final @Nullable ItemStack[] states;
-
-        public ContentItem(@NotNull ItemStack itemStack) {
-            this.itemStack = itemStack;
-            this.states = null;
-
-        }
 
         public ContentItem(@NotNull ItemStack itemStack, @Nullable ItemStack[] states) {
             this.itemStack = itemStack;
@@ -50,15 +48,58 @@ public class MenuConfig {
 
         }
 
+        public @NotNull ItemStack getItemStack(@NotNull STATE state, @Nullable Map<String, String> placeholders) {
+            ItemStack item = null;
+
+            if (states == null || state == STATE.DEFAULT) item = itemStack;
+
+            if (item == null) {
+                item = states[state.state];
+                item = item != null ? item : itemStack;
+            }
+
+            item = item.clone();
+
+            if (placeholders == null) return item;
+
+            ItemMeta meta = item.getItemMeta();
+            if (meta == null) return item;
+
+            String displayName = meta.getDisplayName();
+            List<String> lore = meta.getLore();
+
+            if (!displayName.isEmpty()) {
+                for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                    displayName = displayName.replaceAll("%" + entry.getKey() + "%", entry.getValue());
+                }
+                meta.setDisplayName(displayName);
+            }
+
+            if (lore != null) {
+                for (int i = 0; i < lore.size(); i++) {
+                    String out = lore.get(i);
+                    for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                        out = out.replaceAll("%" + entry.getKey() + "%", entry.getValue());
+                    }
+                    lore.set(i, out);
+                }
+                meta.setLore(lore);
+            }
+
+            item.setItemMeta(meta);
+            return item;
+        }
+
     }
     public MenuConfig(JavaPlugin plugin) {
         this.config = new YamlConfig(plugin, "menu");
         reload();
 
-
     }
 
     public void reload() {
+
+        config.reloadConfig();
         outputSlots.clear();
 
         // TODO: check if size is even logical
@@ -96,24 +137,25 @@ public class MenuConfig {
         return inventory;
     }
 
-    public @NotNull ItemStack[] getContents() {
-        return getContents(null);
-    }
-
-    public @NotNull ItemStack[] getContents(@Nullable Integer state) {
+    public @NotNull ItemStack[] getContents(int bookshelves, @Nullable ItemStack itemStack) {
         ItemStack[] result = new ItemStack[content.length];
 
+        int slot = 0;
         for (int i = 0; i < content.length; i++) {
             if (content[i] == null) continue;
-            if (state == null || content[i].states == null) {
-                result[i] = content[i].itemStack;
+            if (itemStack == null || content[i].states == null || content[i].states[STATE.ENCHANT_ITEMS.state] == null) {
+                result[i] = content[i].getItemStack(STATE.DEFAULT, null);
                 continue;
             }
-            result[i] = content[i].states[state];
+
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("levels", bookshelves + "");
+            placeholders.put("enchantment", slot++ + "");
+
+            result[i] = content[i].getItemStack(STATE.ENCHANT_ITEMS, placeholders);
+
         }
-
         return result;
-
     }
 
     public @NotNull String getTitle() {
@@ -139,21 +181,17 @@ public class MenuConfig {
         ItemStack[] result = new ItemStack[4];
 
         for (String key : states.getKeys(false)) {
-            int i = switch (key) {
-                case "enchant_item" -> 0;
-                case "missing_levels" -> 1;
-                case "unenchantable_item" -> 2;
-                case "missing_lapis_lazuli" -> 3;
-                default -> -1;
+            STATE i = switch (key) {
+                case "enchant_item" -> STATE.ENCHANT_ITEMS;
+                case "missing_levels" -> STATE.MISSING_LEVEL;
+                //case "unenchantable_item" -> 2;
+                //case "missing_lapis_lazuli" -> 3;
+                default -> STATE.DEFAULT;
             };
 
-            if (i == -1) {
-                // TODO: throw error
-                continue;
-            }
-
-            // TODO: put placeholders
-            result[i] = getItemStack(path + ".states." + key);
+            // throw error
+            if (i == STATE.DEFAULT) continue;
+            result[i.state] = getItemStack(path + ".states." + key);
 
         }
         return result;

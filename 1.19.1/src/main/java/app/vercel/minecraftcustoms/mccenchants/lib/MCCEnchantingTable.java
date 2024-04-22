@@ -23,6 +23,7 @@ import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_20_R3.util.RandomSourceWrapper;
 import org.bukkit.enchantments.EnchantmentTarget;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -108,14 +109,14 @@ public class MCCEnchantingTable {
 
     }
 
-    public static int getEnchantingSeed(@NotNull Player player) {
+    public static int getEnchantingSeed(@NotNull HumanEntity player) {
         CraftPlayer craftPlayer = (CraftPlayer) player;
         return craftPlayer.getHandle().getEnchantmentSeed();
 
     }
 
     // TODO: pass item stack that we're enchanting.
-    public static void updateEnchantingSeed(@NotNull Player player) {
+    public static void updateEnchantingSeed(@NotNull HumanEntity player) {
         CraftPlayer craftPlayer = (CraftPlayer) player;
         craftPlayer.getHandle().onEnchantmentPerformed(CraftItemStack.asNMSCopy(new ItemStack(Material.AIR)), 0);
 
