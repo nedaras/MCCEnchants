@@ -5,18 +5,18 @@ import app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCInventory;
 import app.vercel.minecraftcustoms.mccenchants.configs.MenuConfig;
 import app.vercel.minecraftcustoms.mccenchants.lib.MCCEnchantingTable;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R3.enchantments.CraftEnchantment;
-import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -27,6 +27,8 @@ public class InventoryListener implements Listener {
     // TODO: someday add PAPI support
     // TODO: add a check if event is already canceled
     // TODO: check a way to like make slots not interactive
+    // TODO: add a check when player gets exp and update inv
+    // TODO: handle distance check for when inv should be closed and if other player breaks the inv or we die and more shit
 
     private static final Map<UUID, Data> playerData = new HashMap<>();
     private final MenuConfig config;
@@ -44,9 +46,60 @@ public class InventoryListener implements Listener {
         Data data = playerData.get(event.getWhoClicked().getUniqueId());
         // this so we would not race events
         if (data.taskId != null && Bukkit.getScheduler().isQueued(data.taskId)) {
-            System.out.println("cancel");
             event.setCancelled(true);
             return;
+        }
+
+        for (Integer i : config.getOutputSlots()) {
+            if (i == event.getSlot()) {
+                ItemStack itemStack = event.getInventory().getItem(i);
+                ItemStack inputItem = event.getInventory().getItem(config.getInputSlot());
+                ItemStack lapisItem = event.getInventory().getItem(config.getLapisSlot());
+
+                if (itemStack == null || inputItem == null) break;
+
+                ItemMeta meta = itemStack.getItemMeta();
+                if (meta == null) break;
+
+                Byte slot = meta.getPersistentDataContainer().get(config.getSlotNamespace(), PersistentDataType.BYTE);
+                if (slot == null) break;
+
+                Random random = new Random(MCCEnchantingTable.getEnchantingSeed(event.getWhoClicked()) + slot - 1);
+                int cost = MCCEnchantingTable.getEnchantingCost(random, slot, data.bookshelves, inputItem);
+
+                for (EnchantmentInstance instance : MCCEnchantingTable.getEnchantments(random, cost, inputItem)) {
+                    inputItem.addUnsafeEnchantment(CraftEnchantment.minecraftToBukkit(instance.enchantment), instance.level);
+                }
+
+                if (event.getWhoClicked().getGameMode() != GameMode.CREATIVE && lapisItem != null) {
+                    if (lapisItem.getAmount() > slot) {
+                        lapisItem.setAmount(lapisItem.getAmount() - slot);
+                    } else {
+                        lapisItem = null;
+                    }
+                }
+
+                // TODO: update seed and handle books stored enchants and like not make null item remove one item from it and remove levels, play sounds
+                MCCInventory.saveAddItemToInventory(event.getWhoClicked(), inputItem);
+
+                //pitch calculated: world.random.nextFloat() * 0.1F + 0.9F
+                ((Player) event.getWhoClicked()).playSound(data.blockLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 1.0f, 1.0f);
+
+                event.getInventory().setItem(config.getInputSlot(), null);
+                event.getInventory().setItem(config.getLapisSlot(), lapisItem);
+
+                ItemStack[] content = config.getContents(event.getWhoClicked(), data.bookshelves, null, lapisItem);
+
+                for (int j = 0; j < event.getInventory().getContents().length; j++) {
+                    if (j == config.getInputSlot()) continue;
+                    if (j == config.getLapisSlot()) continue;
+                    event.getInventory().setItem(j, content[j]);
+                }
+
+                event.setCancelled(true);
+                return;
+
+            }
         }
 
         if (event.getClickedInventory().getType() != InventoryType.PLAYER) {
@@ -61,9 +114,10 @@ public class InventoryListener implements Listener {
 
         ItemStack cursor = event.getView().getCursor() == null ? null : event.getView().getCursor().clone();
         ItemStack inputItem = event.getInventory().getItem(config.getInputSlot()) == null ? null : event.getInventory().getItem(config.getInputSlot()).clone();
+        ItemStack lapisItem = event.getInventory().getItem(config.getLapisSlot()) == null ? null : event.getInventory().getItem(config.getLapisSlot()).clone();
 
         data.taskId = Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
-            ItemStack[] content2 = config.getContents(data.bookshelves, inputItem);
+            ItemStack[] content2 = config.getContents(event.getWhoClicked(), data.bookshelves, inputItem, lapisItem);
             for (int i = 0; i < event.getInventory().getContents().length; i++) {
                 if (i == config.getInputSlot()) continue;
                 if (i == config.getLapisSlot()) continue;
@@ -79,8 +133,9 @@ public class InventoryListener implements Listener {
             // TODO: add early returns with click actions
 
             ItemStack itemStack = event.getInventory().getItem(config.getInputSlot());
+            ItemStack lapis = event.getInventory().getItem(config.getLapisSlot());
             if (itemStack == null || itemStack.getType() == Material.AIR) {
-                ItemStack[] content = config.getContents(data.bookshelves, null);
+                ItemStack[] content = config.getContents(event.getWhoClicked(), data.bookshelves, null, lapis);
                 for (int i = 0; i < event.getInventory().getContents().length; i++) {
                     if (i == config.getInputSlot()) continue;
                     if (i == config.getLapisSlot()) continue;
@@ -89,7 +144,7 @@ public class InventoryListener implements Listener {
                 return;
             };
 
-            ItemStack[] content = config.getContents(data.bookshelves, itemStack);
+            ItemStack[] content = config.getContents(event.getWhoClicked(), data.bookshelves, itemStack, lapis);
             for (int i = 0; i < event.getInventory().getContents().length; i++) {
                 if (i == config.getInputSlot()) continue;
                 if (i == config.getLapisSlot()) continue;
@@ -102,28 +157,6 @@ public class InventoryListener implements Listener {
     private boolean eq(@Nullable ItemStack a, @Nullable ItemStack b) {
         if (a == null || b == null) return a == b;
         return a.equals(b);
-    }
-
-    private void enchantItem(@NotNull Inventory inventory, @NotNull HumanEntity player, int bookshelves, int slot) {
-
-         ItemStack itemStack = inventory.getItem(config.getInputSlot());
-         if (itemStack == null) return;
-
-        Random random = new Random(MCCEnchantingTable.getEnchantingSeed(player) + slot);
-        int cost = MCCEnchantingTable.getEnchantingCost(random, slot + 1, bookshelves, itemStack);
-
-        if (cost < slot + 1) return;
-
-        for (EnchantmentInstance enchantmentInstance : MCCEnchantingTable.getEnchantments(random, cost, itemStack)) {
-            itemStack.addUnsafeEnchantment(CraftEnchantment.minecraftToBukkit(enchantmentInstance.enchantment), enchantmentInstance.level);
-
-        }
-
-        MCCInventory.saveAddItemToInventory(player, itemStack);
-        inventory.setItem(config.getInputSlot(), null);
-
-        MCCEnchantingTable.updateEnchantingSeed(player);
-
     }
 
     @EventHandler
@@ -141,6 +174,7 @@ public class InventoryListener implements Listener {
         ItemStack[] top = cloneContent(event.getView().getTopInventory().getContents());
         ItemStack[] bottom = cloneContent(event.getView().getBottomInventory().getContents());
 
+        event.setCancelled(true);
         data.taskId = Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
         }, 0).getTaskId();
     }
@@ -163,7 +197,7 @@ public class InventoryListener implements Listener {
         boolean hasItemInHand = event.getPlayer().getInventory().getItemInMainHand().getType() != Material.AIR || event.getPlayer().getInventory().getItemInOffHand().getType() != Material.AIR;
         if (event.getPlayer().isSneaking() && hasItemInHand) return;
 
-        playerData.put(event.getPlayer().getUniqueId(), new Data(MCCEnchantingTable.getSurroundingBookshelves(event.getClickedBlock())));
+        playerData.put(event.getPlayer().getUniqueId(), new Data(event.getClickedBlock()));
 
         event.getPlayer().openInventory(config.getInventory(event.getPlayer()));
         event.setCancelled(true);
@@ -180,20 +214,16 @@ public class InventoryListener implements Listener {
 
     }
 
-    private static @Nullable EnchantmentInstance getFirstEnchant(@NotNull Random random, @NotNull ItemStack item, int cost) {
-        List<EnchantmentInstance> enchantments = MCCEnchantingTable.getEnchantments(random, cost, item);
-        return enchantments.isEmpty() ? null : enchantments.get(0);
-
-    }
-
 }
 
 class Data {
     public @Nullable Integer taskId;
-    public int bookshelves;
+    public final int bookshelves;
+    public final Location blockLocation;
 
-    Data(int bookshelves) {
+    Data(Block block) {
         this.taskId = null;
-        this.bookshelves = bookshelves;
+        this.bookshelves = MCCEnchantingTable.getSurroundingBookshelves(block);
+        this.blockLocation = block.getLocation();
     }
 }

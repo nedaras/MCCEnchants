@@ -29,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -68,7 +69,8 @@ public class MCCEnchantingTable {
 
     }
 
-    public static boolean canEnchantItem(@NotNull ItemStack item) {
+    public static boolean canEnchantItem(@Nullable ItemStack item) {
+        if (item == null) return false;
         if (!item.getEnchantments().isEmpty()) return false;
         if (CraftItemStack.asNMSCopy(item).getItem().getEnchantmentValue() <= 0) return false;
 

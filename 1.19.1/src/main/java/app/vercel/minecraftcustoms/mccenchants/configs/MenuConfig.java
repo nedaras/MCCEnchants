@@ -1,13 +1,16 @@
 package app.vercel.minecraftcustoms.mccenchants.configs;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
+import app.vercel.minecraftcustoms.mccenchants.lib.MCCEnchantingTable;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,11 +26,14 @@ public class MenuConfig {
     private int inputSlot;
     private int lapisSlot;
     private final Set<@NotNull Integer> outputSlots = new TreeSet<>();
+    private final @NotNull NamespacedKey slotNamespace;
 
     enum STATE {
         DEFAULT(-1),
-        ENCHANT_ITEMS(0),
-        MISSING_LEVEL(1);
+        ENCHANT(0),
+        UNENCHANTABLE(1),
+        MISSING_LEVELS(2),
+        MISSING_LAPIS(3);
 
         public final int state;
 
@@ -93,6 +99,7 @@ public class MenuConfig {
     }
     public MenuConfig(JavaPlugin plugin) {
         this.config = new YamlConfig(plugin, "menu");
+        this.slotNamespace = new NamespacedKey(plugin, "slot");
         reload();
 
     }
@@ -137,29 +144,86 @@ public class MenuConfig {
         return inventory;
     }
 
-    public @NotNull ItemStack[] getContents(int bookshelves, @Nullable ItemStack itemStack) {
+    // TODO: we need lapis
+    public @NotNull ItemStack[] getContents(HumanEntity player, int bookshelves, @Nullable ItemStack inputItem, @Nullable ItemStack lapisItem) {
         ItemStack[] result = new ItemStack[content.length];
 
         int slot = 0;
         for (int i = 0; i < content.length; i++) {
             if (content[i] == null) continue;
-            if (itemStack == null || content[i].states == null || content[i].states[STATE.ENCHANT_ITEMS.state] == null) {
+            if (inputItem == null || content[i].states == null || content[i].states[STATE.ENCHANT.state] == null) {
+                result[i] = content[i].getItemStack(STATE.DEFAULT, null);
+                continue;
+            }
+
+            // TODO: increase slot only for state that has STATE.ENCHANT and display all items to its state
+            // Make so other way to find output slots prob somewhere in config
+            Random random = new Random(MCCEnchantingTable.getEnchantingSeed(player) + slot++);
+            int cost = MCCEnchantingTable.getEnchantingCost(random, slot, bookshelves, inputItem);
+
+            if (!MCCEnchantingTable.canEnchantItem(inputItem)) {
+                result[i] = content[i].getItemStack(STATE.UNENCHANTABLE, null);
+                continue;
+            }
+
+            if (cost <= slot) {
+                result[i] = content[i].getItemStack(STATE.DEFAULT, null);
+                continue;
+            }
+
+            EnchantmentInstance enchantmentInstance = getFirstEnchant(random, inputItem, cost);
+            if (enchantmentInstance == null) {
                 result[i] = content[i].getItemStack(STATE.DEFAULT, null);
                 continue;
             }
 
             Map<String, String> placeholders = new HashMap<>();
-            placeholders.put("levels", bookshelves + "");
-            placeholders.put("enchantment", slot++ + "");
+            placeholders.put("enchantment", CraftMCCEnchantment.minecraftToCustoms(enchantmentInstance.enchantment).getKey().getKey() + " " + enchantmentInstance.level);
+            placeholders.put("levels", slot + "");
+            placeholders.put("level", cost + "");
 
-            result[i] = content[i].getItemStack(STATE.ENCHANT_ITEMS, placeholders);
+            if (player.getGameMode() != GameMode.CREATIVE) {
+                if (cost > ((Player) player).getLevel()) {
+                    result[i] = content[i].getItemStack(STATE.MISSING_LEVELS, placeholders);
+                    continue;
+                }
+
+                if (lapisItem == null || lapisItem.getType() != Material.LAPIS_LAZULI || lapisItem.getAmount() < slot) {
+                    result[i] = content[i].getItemStack(STATE.MISSING_LAPIS, placeholders);
+                    continue;
+                }
+            }
+
+            ItemStack resultItem = content[i].getItemStack(STATE.ENCHANT, placeholders);
+            ItemMeta meta = resultItem.getItemMeta();
+
+            // TODO: idk throw error??
+            if (meta == null) {
+                result[i] = content[i].getItemStack(STATE.DEFAULT, null);
+                continue;
+            }
+
+            meta.getPersistentDataContainer().set(slotNamespace, PersistentDataType.BYTE, (byte) slot);
+            resultItem.setItemMeta(meta);
+
+            result[i] = resultItem;
 
         }
         return result;
     }
 
+    private static @Nullable EnchantmentInstance getFirstEnchant(@NotNull Random random, @NotNull ItemStack item, int cost) {
+        List<EnchantmentInstance> enchantments = MCCEnchantingTable.getEnchantments(random, cost, item);
+        return enchantments.isEmpty() ? null : enchantments.get(0);
+
+    }
+
     public @NotNull String getTitle() {
         return title;
+    }
+
+    public @NotNull NamespacedKey getSlotNamespace() {
+        return slotNamespace;
     }
 
     public int getInputSlot() {
@@ -182,10 +246,10 @@ public class MenuConfig {
 
         for (String key : states.getKeys(false)) {
             STATE i = switch (key) {
-                case "enchant_item" -> STATE.ENCHANT_ITEMS;
-                case "missing_levels" -> STATE.MISSING_LEVEL;
-                //case "unenchantable_item" -> 2;
-                //case "missing_lapis_lazuli" -> 3;
+                case "enchant" -> STATE.ENCHANT;
+                case "unenchantable" -> STATE.UNENCHANTABLE;
+                case "missing_levels" -> STATE.MISSING_LEVELS;
+                case "missing_lapis" -> STATE.MISSING_LAPIS;
                 default -> STATE.DEFAULT;
             };
 
