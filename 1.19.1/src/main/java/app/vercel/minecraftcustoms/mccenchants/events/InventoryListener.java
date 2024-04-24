@@ -15,8 +15,10 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -38,7 +40,27 @@ public class InventoryListener implements Listener {
     }
 
 
-    // TODO: check if clieked on invalid slit if it is event set cancel early cuz if not we can like swap simular items
+    private void enchantItemStack(@NotNull ItemStack itemStack, @NotNull List<EnchantmentInstance> enchantmentInstances) {
+        if (enchantmentInstances.isEmpty()) return;
+        if (itemStack.getType() == Material.BOOK) {
+            itemStack.setType(Material.ENCHANTED_BOOK);
+        }
+
+        if (itemStack.getItemMeta() instanceof EnchantmentStorageMeta storageMeta) {
+            for (EnchantmentInstance instance : enchantmentInstances) {
+                storageMeta.addStoredEnchant(CraftEnchantment.minecraftToBukkit(instance.enchantment), instance.level, true);
+            }
+
+            itemStack.setItemMeta(storageMeta);
+            return;
+        }
+
+        for (EnchantmentInstance instance : enchantmentInstances) {
+            itemStack.addUnsafeEnchantment(CraftEnchantment.minecraftToBukkit(instance.enchantment), instance.level);
+        }
+
+    }
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getClickedInventory() == null) return;
@@ -67,9 +89,15 @@ public class InventoryListener implements Listener {
                 Random random = new Random(MCCEnchantingTable.getEnchantingSeed(event.getWhoClicked()) + slot - 1);
                 int cost = MCCEnchantingTable.getEnchantingCost(random, slot, data.bookshelves, inputItem);
 
-                for (EnchantmentInstance instance : MCCEnchantingTable.getEnchantments(random, cost, inputItem)) {
-                    inputItem.addUnsafeEnchantment(CraftEnchantment.minecraftToBukkit(instance.enchantment), instance.level);
-                }
+                ItemStack outItem = inputItem.clone();
+                ItemStack newInputItem = inputItem.clone();
+
+                outItem.setAmount(1);
+
+                if (newInputItem.getAmount() > 1) newInputItem.setAmount(newInputItem.getAmount() - 1);
+                else newInputItem = null;
+
+                enchantItemStack(outItem, MCCEnchantingTable.getEnchantments(random, cost, outItem));
 
                 if (event.getWhoClicked().getGameMode() != GameMode.CREATIVE && lapisItem != null) {
                     if (lapisItem.getAmount() > slot) {
@@ -79,16 +107,20 @@ public class InventoryListener implements Listener {
                     }
                 }
 
-                // TODO: update seed and handle books stored enchants and like not make null item remove one item from it and remove levels, play sounds
-                MCCInventory.saveAddItemToInventory(event.getWhoClicked(), inputItem);
+                MCCInventory.saveAddItemToInventory(event.getWhoClicked(), outItem);
+                Player player = (Player) event.getWhoClicked();
 
-                //pitch calculated: world.random.nextFloat() * 0.1F + 0.9F
-                ((Player) event.getWhoClicked()).playSound(data.blockLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 1.0f, 1.0f);
+                player.playSound(data.blockLocation, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.BLOCKS, 1.0f, new Random().nextFloat() * 0.1f + 0.9f);
 
-                event.getInventory().setItem(config.getInputSlot(), null);
+                event.getInventory().setItem(config.getInputSlot(), newInputItem);
                 event.getInventory().setItem(config.getLapisSlot(), lapisItem);
 
-                ItemStack[] content = config.getContents(event.getWhoClicked(), data.bookshelves, null, lapisItem);
+                MCCEnchantingTable.updateEnchantingSeed(event.getWhoClicked());
+                if (event.getWhoClicked().getGameMode() != GameMode.CREATIVE) {
+                    player.setLevel(player.getLevel() - slot);
+                }
+
+                ItemStack[] content = config.getContents(event.getWhoClicked(), data.bookshelves, newInputItem, lapisItem);
 
                 for (int j = 0; j < event.getInventory().getContents().length; j++) {
                     if (j == config.getInputSlot()) continue;
@@ -130,19 +162,9 @@ public class InventoryListener implements Listener {
                 }
             }
 
-            // TODO: add early returns with click actions
-
+            // TODO: only update top if u know top changes now if we press bottom inventory content still updates
             ItemStack itemStack = event.getInventory().getItem(config.getInputSlot());
             ItemStack lapis = event.getInventory().getItem(config.getLapisSlot());
-            if (itemStack == null || itemStack.getType() == Material.AIR) {
-                ItemStack[] content = config.getContents(event.getWhoClicked(), data.bookshelves, null, lapis);
-                for (int i = 0; i < event.getInventory().getContents().length; i++) {
-                    if (i == config.getInputSlot()) continue;
-                    if (i == config.getLapisSlot()) continue;
-                    event.getInventory().setItem(i, content[i]);
-                }
-                return;
-            };
 
             ItemStack[] content = config.getContents(event.getWhoClicked(), data.bookshelves, itemStack, lapis);
             for (int i = 0; i < event.getInventory().getContents().length; i++) {

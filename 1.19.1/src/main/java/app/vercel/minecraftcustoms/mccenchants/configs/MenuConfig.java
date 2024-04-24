@@ -166,7 +166,7 @@ public class MenuConfig {
                 continue;
             }
 
-            if (cost <= slot) {
+            if (cost < slot) {
                 result[i] = content[i].getItemStack(STATE.DEFAULT, null);
                 continue;
             }
