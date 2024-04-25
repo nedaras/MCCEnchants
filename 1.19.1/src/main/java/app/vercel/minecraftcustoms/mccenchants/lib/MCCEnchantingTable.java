@@ -35,40 +35,6 @@ import java.util.*;
 
 public class MCCEnchantingTable {
 
-    // TODO: books ye
-    public static @NotNull ItemStack enchantItem(@NotNull Random random, int enchantingCost, @NotNull ItemStack item) {
-        item = item.clone();
-        item.setAmount(1);
-
-        List<EnchantmentInstance> enchantments = getEnchantments(random, enchantingCost, item);
-
-        if (item.getType() == Material.BOOK) {
-            item.setType(Material.ENCHANTED_BOOK);
-
-            ItemMeta meta = item.getItemMeta();
-            EnchantmentStorageMeta storageMeta = (EnchantmentStorageMeta) meta;
-
-            if (meta == null) return item;
-
-            for (EnchantmentInstance instance : enchantments) {
-                storageMeta.addStoredEnchant(CraftEnchantment.minecraftToBukkit(instance.enchantment), instance.level, true);
-
-            }
-
-            item.setItemMeta(storageMeta);
-
-            return item;
-        }
-
-        for (EnchantmentInstance instance : enchantments) {
-            item.addUnsafeEnchantment(CraftEnchantment.minecraftToBukkit(instance.enchantment), instance.level);
-
-        }
-
-        return item;
-
-    }
-
     public static boolean canEnchantItem(@Nullable ItemStack item) {
         if (item == null) return false;
         if (!item.getEnchantments().isEmpty()) return false;

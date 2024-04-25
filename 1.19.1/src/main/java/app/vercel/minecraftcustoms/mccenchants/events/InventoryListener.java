@@ -184,20 +184,47 @@ public class InventoryListener implements Listener {
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
         if (!event.getView().getTitle().equals(config.getTitle())) return;
-
         Data data = playerData.get(event.getWhoClicked().getUniqueId());
-        if (data == null) return;
 
+        if (data == null) return;
         if (data.taskId != null && Bukkit.getScheduler().isQueued(data.taskId)) {
             event.setCancelled(true);
             return;
         }
 
+        if (event.getRawSlots().stream().noneMatch((i) -> event.getView().getTopInventory().getSize() > i)) return;
+
         ItemStack[] top = cloneContent(event.getView().getTopInventory().getContents());
         ItemStack[] bottom = cloneContent(event.getView().getBottomInventory().getContents());
 
-        event.setCancelled(true);
+        ItemStack inputItem = event.getInventory().getItem(config.getInputSlot()) == null ? null : event.getInventory().getItem(config.getInputSlot()).clone();
+        ItemStack lapisItem = event.getInventory().getItem(config.getLapisSlot()) == null ? null : event.getInventory().getItem(config.getLapisSlot()).clone();
+
         data.taskId = Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
+            ItemStack[] content2 = config.getContents(event.getWhoClicked(), data.bookshelves, inputItem, lapisItem);
+            for (int i = 0; i < event.getInventory().getContents().length; i++) {
+                if (i == config.getInputSlot()) continue;
+                if (i == config.getLapisSlot()) continue;
+                if (!eq(event.getInventory().getItem(i), content2[i])) {
+                    event.getView().getTopInventory().setContents(top);
+                    event.getView().getBottomInventory().setContents(bottom);
+                    event.getView().setCursor(event.getOldCursor());
+
+                    return;
+                }
+            }
+
+            // TODO: only update top if u know top changes now if we press bottom inventory content still updates
+            ItemStack itemStack = event.getInventory().getItem(config.getInputSlot());
+            ItemStack lapis = event.getInventory().getItem(config.getLapisSlot());
+
+            ItemStack[] content = config.getContents(event.getWhoClicked(), data.bookshelves, itemStack, lapis);
+            for (int i = 0; i < event.getInventory().getContents().length; i++) {
+                if (i == config.getInputSlot()) continue;
+                if (i == config.getLapisSlot()) continue;
+                event.getInventory().setItem(i, content[i]);
+            }
+
         }, 0).getTaskId();
     }
 
