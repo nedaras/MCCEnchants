@@ -8,12 +8,16 @@ import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R3.enchantments.CraftEnchantment;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -25,12 +29,24 @@ import java.util.*;
 
 public class InventoryListener implements Listener {
 
+    private static class Data {
+        public @Nullable Integer taskId;
+        public final int bookshelves;
+        public final Location blockLocation;
+
+        Data(Block block) {
+            this.taskId = null;
+            this.bookshelves = MCCEnchantingTable.getSurroundingBookshelves(block);
+            this.blockLocation = block.getLocation();
+        }
+    }
 
     // TODO: someday add PAPI support
     // TODO: add a check if event is already canceled
     // TODO: check a way to like make slots not interactive
     // TODO: add a check when player gets exp and update inv
     // TODO: handle distance check for when inv should be closed and if other player breaks the inv or we die and more shit
+    // TODO: when riding animals position events are not called
 
     private static final Map<UUID, Data> playerData = new HashMap<>();
     private final MenuConfig config;
@@ -213,6 +229,8 @@ public class InventoryListener implements Listener {
                     return;
                 }
             }
+            // distance shit
+            //return !world.getBlockState(blockposition).is(block) ? false : entityhuman.distanceToSqr((double)blockposition.getX() + 0.5, (double)blockposition.getY() + 0.5, (double)blockposition.getZ() + 0.5) <= 64.0;
 
             // TODO: only update top if u know top changes now if we press bottom inventory content still updates
             ItemStack itemStack = event.getInventory().getItem(config.getInputSlot());
@@ -255,6 +273,7 @@ public class InventoryListener implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         if (!event.getView().getTitle().equals(config.getTitle())) return;
+        if (!playerData.containsKey(event.getPlayer().getUniqueId())) return;
 
         MCCInventory.saveAddItemToInventory(event.getPlayer(), event.getInventory().getItem(config.getInputSlot()));
         MCCInventory.saveAddItemToInventory(event.getPlayer(), event.getInventory().getItem(config.getLapisSlot()));
@@ -263,16 +282,39 @@ public class InventoryListener implements Listener {
 
     }
 
-}
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent event) {
+        Data data = playerData.get(event.getPlayer().getUniqueId());
 
-class Data {
-    public @Nullable Integer taskId;
-    public final int bookshelves;
-    public final Location blockLocation;
+        if (data == null) return;
+        if (isValid(event.getPlayer(), data.blockLocation)) return;
 
-    Data(Block block) {
-        this.taskId = null;
-        this.bookshelves = MCCEnchantingTable.getSurroundingBookshelves(block);
-        this.blockLocation = block.getLocation();
+        event.getPlayer().closeInventory();
+
+    }
+
+    private boolean isValid(@NotNull HumanEntity player, @NotNull Location location) {
+        Block block = player.getWorld().getBlockAt(location);
+        if (block.getType() != Material.ENCHANTING_TABLE) return false;
+
+        double x = player.getLocation().getX() - (double) location.getBlockX() - 0.5;
+        double y = player.getLocation().getY() - (double) location.getBlockY() - 0.5;
+        double z = player.getLocation().getZ() - (double) location.getBlockZ() - 0.5;
+
+        return x * x + y * y + z * z <= 64.0;
+    }
+
+    @EventHandler
+    public void onVehicleMove(VehicleMoveEvent event) {
+        for (Entity entity : event.getVehicle().getPassengers()) {
+            if (!(entity instanceof HumanEntity player)) continue;
+            Data data = playerData.get(player.getUniqueId());
+
+            if (data == null) continue;
+            if (isValid(player, data.blockLocation)) continue;
+
+            player.closeInventory();
+        }
     }
 }
+

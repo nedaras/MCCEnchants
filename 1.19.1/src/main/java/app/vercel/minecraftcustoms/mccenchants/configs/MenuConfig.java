@@ -2,6 +2,7 @@ package app.vercel.minecraftcustoms.mccenchants.configs;
 
 import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.lib.MCCEnchantingTable;
+import app.vercel.minecraftcustoms.mccenchants.utils.Utils;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
@@ -178,7 +179,7 @@ public class MenuConfig {
             }
 
             Map<String, String> placeholders = new HashMap<>();
-            placeholders.put("enchantment", CraftMCCEnchantment.minecraftToCustoms(enchantmentInstance.enchantment).getKey().getKey() + " " + enchantmentInstance.level);
+            placeholders.put("enchantment", Utils.getEnchantmentName(CraftMCCEnchantment.minecraftToCustoms(enchantmentInstance.enchantment)) + " " + Utils.toRomeNumber(enchantmentInstance.level));
             placeholders.put("levels", slot + "");
             placeholders.put("level", cost + "");
 

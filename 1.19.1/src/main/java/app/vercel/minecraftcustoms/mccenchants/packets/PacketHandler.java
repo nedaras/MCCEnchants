@@ -15,6 +15,7 @@ import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.trading.MerchantOffer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
@@ -34,7 +35,6 @@ import java.util.Map;
 public class PacketHandler extends ChannelDuplexHandler {
 
     private static Field connectionField;
-    //private static final Map<String, Integer> map = new HashMap<>();
 
     public static void init() {
         try {
@@ -191,7 +191,9 @@ public class PacketHandler extends ChannelDuplexHandler {
         if (lore == null) lore = new ArrayList<>();
 
         for (Map.Entry<Enchantment, Integer> entry : getEnchantments(itemStack, meta).entrySet()) {
-            newLore.add(CraftMCCEnchantment.bukkitToCustoms(entry.getKey()).getName() + " " + Utils.toRomeNumber(entry.getValue()));
+            ChatColor color = CraftMCCEnchantment.bukkitToCustoms(entry.getKey()).isCursed() ? ChatColor.RED : ChatColor.GRAY;
+            newLore.add(color + Utils.getEnchantmentName(entry.getKey()) + " " + Utils.toRomeNumber(entry.getValue()));
+
         }
 
         newLore.addAll(lore);
