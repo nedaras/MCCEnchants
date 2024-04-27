@@ -2,8 +2,10 @@ package app.vercel.minecraftcustoms.mccenchants.enchantments;
 
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.EnchantmentRarity;
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.enchantment.Enchantment;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.craftbukkit.v1_20_R3.CraftRegistry;
@@ -18,6 +20,7 @@ public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<En
 
     private final NamespacedKey key;
     private final Enchantment handle;
+    private final int id;
 
     public static MCCEnchantment minecraftToCustoms(@NotNull Enchantment minecraft) {
         org.bukkit.enchantments.Enchantment enchantment = CraftRegistry.minecraftToBukkit(minecraft, Registries.ENCHANTMENT, Registry.ENCHANTMENT);
@@ -39,6 +42,7 @@ public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<En
     public CraftMCCEnchantment(NamespacedKey key, net.minecraft.world.item.enchantment.Enchantment handle) {
         this.handle = handle;
         this.key = key;
+        this.id = BuiltInRegistries.ENCHANTMENT.getId(handle);
     }
 
     public net.minecraft.world.item.enchantment.Enchantment getHandle() {
@@ -48,6 +52,55 @@ public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<En
     @NotNull
     public NamespacedKey getKey() {
         return this.key;
+    }
+
+    @Override
+    @NotNull
+    public String getName() {
+        if (handle instanceof NMSEnchantment nms) return nms.getName();
+        // TODO: im dumb why am i using ids i need to use namespace
+        return switch (id) {
+            case 0 -> "Protection";
+            case 1 -> "Fire Protection";
+            case 2 -> "Feather Falling";
+            case 3 -> "Blast Protection";
+            case 4 -> "Projectile Protection";
+            case 5 -> "Respiration";
+            case 6 -> "Aqua Affinity";
+            case 7 -> "Thorns";
+            case 8 -> "Depth Strider";
+            case 9 -> "Frost Walker";
+            case 10 -> "Curse of Binding";
+            case 11 -> "Saul Speed";
+            case 12 -> "Swift Sneak";
+            case 13 -> "Sharpness";
+            case 14 -> "Smite";
+            case 15 -> "Bane of Arthropods";
+            case 16 -> "Knockback";
+            case 17 -> "Fire Aspect";
+            case 18 -> "Looting";
+            case 19 -> "Sweeping Edge";
+            case 20 -> "Efficiency";
+            case 21 -> "Silk Touch";
+            case 22 -> "Unbreaking";
+            case 23 -> "Fortune";
+            case 24 -> "Power";
+            case 25 -> "Punch";
+            case 26 -> "Flame";
+            case 27 -> "Infinity";
+            case 28 -> "Luck";
+            case 29 -> "Lure";
+            case 30 -> "Loyalty";
+            case 31 -> "Impaling";
+            case 32 -> "Riptide";
+            case 33 -> "Channeling";
+            case 34 -> "Multishot";
+            case 35 -> "Quick Charge";
+            case 36 -> "Piercing";
+            case 37 -> "Mending";
+            case 38 -> "Curse of Vanishing";
+            default -> WordUtils.capitalizeFully(getKey().getKey().replaceAll("_", " "));
+        };
     }
 
     @Override

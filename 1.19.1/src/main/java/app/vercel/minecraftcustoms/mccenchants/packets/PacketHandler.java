@@ -192,7 +192,7 @@ public class PacketHandler extends ChannelDuplexHandler {
 
         for (Map.Entry<Enchantment, Integer> entry : getEnchantments(itemStack, meta).entrySet()) {
             ChatColor color = CraftMCCEnchantment.bukkitToCustoms(entry.getKey()).isCursed() ? ChatColor.RED : ChatColor.GRAY;
-            newLore.add(color + Utils.getEnchantmentName(entry.getKey()) + " " + Utils.toRomeNumber(entry.getValue()));
+            newLore.add(color + Utils.getEnchantmentName(entry.getKey(), entry.getValue()));
 
         }
 

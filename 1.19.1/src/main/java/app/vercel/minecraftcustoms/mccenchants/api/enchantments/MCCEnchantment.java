@@ -4,7 +4,6 @@ import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.enchantments.NMSEnchantment;
 import net.minecraft.core.registries.BuiltInRegistries;
 import com.google.common.base.Preconditions;
-import org.apache.commons.lang.WordUtils;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -39,11 +38,8 @@ public abstract class MCCEnchantment implements Keyed, Translatable {
         return CraftMCCEnchantment.bukkitToCustoms(enchantment);
     }
 
-    public @NotNull String getName() {
-        // TODO: fix it like color and fix names or mb import names from config
-        return WordUtils.capitalizeFully(this.getKey().getKey().replace("_", " "));
-
-    }
+    @NotNull
+    public abstract String getName();
 
     public abstract int getMaxLevel();
 

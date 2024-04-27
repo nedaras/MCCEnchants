@@ -179,7 +179,7 @@ public class MenuConfig {
             }
 
             Map<String, String> placeholders = new HashMap<>();
-            placeholders.put("enchantment", Utils.getEnchantmentName(CraftMCCEnchantment.minecraftToCustoms(enchantmentInstance.enchantment)) + " " + Utils.toRomeNumber(enchantmentInstance.level));
+            placeholders.put("enchantment", Utils.getEnchantmentName(enchantmentInstance.enchantment, enchantmentInstance.level));
             placeholders.put("levels", slot + "");
             placeholders.put("level", cost + "");
 

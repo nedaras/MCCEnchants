@@ -293,6 +293,7 @@ public class InventoryListener implements Listener {
 
     }
 
+    // TODO: add some early returns, prob dumb cuz mc server cant handle more then 3 players
     private boolean isValid(@NotNull HumanEntity player, @NotNull Location location) {
         Block block = player.getWorld().getBlockAt(location);
         if (block.getType() != Material.ENCHANTING_TABLE) return false;

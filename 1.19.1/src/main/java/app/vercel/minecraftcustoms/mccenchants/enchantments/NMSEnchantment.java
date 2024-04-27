@@ -53,6 +53,10 @@ public class NMSEnchantment extends Enchantment {
         this.enchantment = enchantment;
     }
 
+    public @NotNull String getName() {
+        return enchantment.getName();
+    }
+
     public @NotNull NamespacedKey getKey() {
         return enchantment.getKey();
 
