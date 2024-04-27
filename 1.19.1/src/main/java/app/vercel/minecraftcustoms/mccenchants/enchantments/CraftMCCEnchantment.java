@@ -20,7 +20,6 @@ public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<En
 
     private final NamespacedKey key;
     private final Enchantment handle;
-    private final int id;
 
     public static MCCEnchantment minecraftToCustoms(@NotNull Enchantment minecraft) {
         org.bukkit.enchantments.Enchantment enchantment = CraftRegistry.minecraftToBukkit(minecraft, Registries.ENCHANTMENT, Registry.ENCHANTMENT);
@@ -42,7 +41,6 @@ public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<En
     public CraftMCCEnchantment(NamespacedKey key, net.minecraft.world.item.enchantment.Enchantment handle) {
         this.handle = handle;
         this.key = key;
-        this.id = BuiltInRegistries.ENCHANTMENT.getId(handle);
     }
 
     public net.minecraft.world.item.enchantment.Enchantment getHandle() {
@@ -58,48 +56,47 @@ public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<En
     @NotNull
     public String getName() {
         if (handle instanceof NMSEnchantment nms) return nms.getName();
-        // TODO: im dumb why am i using ids i need to use namespace
-        return switch (id) {
-            case 0 -> "Protection";
-            case 1 -> "Fire Protection";
-            case 2 -> "Feather Falling";
-            case 3 -> "Blast Protection";
-            case 4 -> "Projectile Protection";
-            case 5 -> "Respiration";
-            case 6 -> "Aqua Affinity";
-            case 7 -> "Thorns";
-            case 8 -> "Depth Strider";
-            case 9 -> "Frost Walker";
-            case 10 -> "Curse of Binding";
-            case 11 -> "Saul Speed";
-            case 12 -> "Swift Sneak";
-            case 13 -> "Sharpness";
-            case 14 -> "Smite";
-            case 15 -> "Bane of Arthropods";
-            case 16 -> "Knockback";
-            case 17 -> "Fire Aspect";
-            case 18 -> "Looting";
-            case 19 -> "Sweeping Edge";
-            case 20 -> "Efficiency";
-            case 21 -> "Silk Touch";
-            case 22 -> "Unbreaking";
-            case 23 -> "Fortune";
-            case 24 -> "Power";
-            case 25 -> "Punch";
-            case 26 -> "Flame";
-            case 27 -> "Infinity";
-            case 28 -> "Luck";
-            case 29 -> "Lure";
-            case 30 -> "Loyalty";
-            case 31 -> "Impaling";
-            case 32 -> "Riptide";
-            case 33 -> "Channeling";
-            case 34 -> "Multishot";
-            case 35 -> "Quick Charge";
-            case 36 -> "Piercing";
-            case 37 -> "Mending";
-            case 38 -> "Curse of Vanishing";
-            default -> WordUtils.capitalizeFully(getKey().getKey().replaceAll("_", " "));
+        return switch (key.toString()) {
+            case "minecraft:protection" -> "Protection";
+            case "minecraft:fire_protection" -> "Fire Protection";
+            case "minecraft:feather_falling" -> "Feather Falling";
+            case "minecraft:blast_protection" -> "Blast Protection";
+            case "minecraft:projectile_protection" -> "Projectile Protection";
+            case "minecraft:respiration" -> "Respiration";
+            case "minecraft:aqua_affinity" -> "Aqua Affinity";
+            case "minecraft:thorns" -> "Thorns";
+            case "minecraft:depth_strider" -> "Depth Strider";
+            case "minecraft:frost_walker" -> "Frost Walker";
+            case "minecraft:binding_curse" -> "Curse of Binding";
+            case "minecraft:soul_speed"  -> "Soul Speed";
+            case "minecraft:swift_sneak" -> "Swift Sneak";
+            case "minecraft:sharpness" -> "Sharpness";
+            case "minecraft:smite" -> "Smite";
+            case "minecraft:bane_of_arthropods" -> "Bane of Arthropods";
+            case "minecraft:knockback" -> "Knockback";
+            case "minecraft:fire_aspect" -> "Fire Aspect";
+            case "minecraft:looting" -> "Looting";
+            case "minecraft:sweeping" -> "Sweeping Edge";
+            case "minecraft:efficiency"-> "Efficiency";
+            case "minecraft:silk_touch" -> "Silk Touch";
+            case "minecraft:unbreaking" -> "Unbreaking";
+            case "minecraft:fortune" -> "Fortune";
+            case "minecraft:power" -> "Power";
+            case "minecraft:punch" -> "Punch";
+            case "minecraft:flame" -> "Flame";
+            case "minecraft:infinity" -> "Infinity";
+            case "minecraft:luck_of_the_sea"-> "Luck of the Sea";
+            case "minecraft:lure" -> "Lure";
+            case "minecraft:loyalty" -> "Loyalty";
+            case "minecraft:impaling" -> "Impaling";
+            case "minecraft:riptide" -> "Riptide";
+            case "minecraft:channeling" -> "Channeling";
+            case "minecraft:multishot" -> "Multishot";
+            case "minecraft:quick_charge" -> "Quick Charge";
+            case "minecraft:piercing" -> "Piercing";
+            case "minecraft:mending" -> "Mending";
+            case "minecraft:vanishing_curse" -> "Curse of Vanishing";
+            default -> WordUtils.capitalizeFully(key.getKey().replaceAll("_", " "));
         };
     }
 

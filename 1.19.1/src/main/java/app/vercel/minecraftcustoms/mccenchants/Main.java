@@ -1,14 +1,11 @@
 package app.vercel.minecraftcustoms.mccenchants;
 
-import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
 import app.vercel.minecraftcustoms.mccenchants.commands.Commands;
 import app.vercel.minecraftcustoms.mccenchants.configs.MenuConfig;
-import app.vercel.minecraftcustoms.mccenchants.configs.NamesConfig;
 import app.vercel.minecraftcustoms.mccenchants.events.InventoryListener;
 import app.vercel.minecraftcustoms.mccenchants.events.PlayerListener;
 import app.vercel.minecraftcustoms.mccenchants.packets.PacketHandler;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
 public final class Main extends JavaPlugin {
 

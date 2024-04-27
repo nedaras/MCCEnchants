@@ -1,7 +1,7 @@
 package app.vercel.minecraftcustoms.mccenchants.commands;
 
 import app.vercel.minecraftcustoms.mccenchants.configs.MenuConfig;
-import app.vercel.minecraftcustoms.mccenchants.configs.NamesConfig;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,7 +22,9 @@ public class Commands implements CommandExecutor, TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+            // TODO: add err handling
             config.reload();
+            commandSender.sendMessage(ChatColor.GREEN + "Reloaded...");
             return true;
         }
         return false;
