@@ -1,7 +1,6 @@
 package app.vercel.minecraftcustoms.mccenchants.configs;
 
-import app.vercel.minecraftcustoms.mccenchants.enchantments.CraftMCCEnchantment;
-import app.vercel.minecraftcustoms.mccenchants.lib.MCCEnchantingTable;
+import app.vercel.minecraftcustoms.mccenchants.utils.MCCEnchantingTable;
 import app.vercel.minecraftcustoms.mccenchants.utils.Utils;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import org.bukkit.*;
@@ -45,6 +44,8 @@ public class MenuConfig {
 
     }
 
+    // TODO: add amount placeholders
+    // TODO: we need to rewrite for them string amounts
     private static class ContentItem {
         final @NotNull ItemStack itemStack;
         final @Nullable ItemStack[] states;
@@ -145,7 +146,6 @@ public class MenuConfig {
         return inventory;
     }
 
-    // TODO: we need lapis
     public @NotNull ItemStack[] getContents(HumanEntity player, int bookshelves, @Nullable ItemStack inputItem, @Nullable ItemStack lapisItem) {
         ItemStack[] result = new ItemStack[content.length];
 

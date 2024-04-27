@@ -79,7 +79,6 @@ public class PacketHandler extends ChannelDuplexHandler {
         channel.pipeline().remove("mcc_enchants");
     }
 
-    // TODO: we need to see if all packets are reversed anvil bug again with books now
     @Override
     public void channelRead(ChannelHandlerContext context, Object packet) throws Exception {
         if (packet instanceof ServerboundSetCreativeModeSlotPacket slotPacket) reverseItemStack(slotPacket.getItem());
@@ -89,21 +88,10 @@ public class PacketHandler extends ChannelDuplexHandler {
                 reverseItemStack(item);
             });
         }
-/*
-        if (map.containsKey(packet.getClass().getSimpleName())) {
-            int times = map.get(packet.getClass().getSimpleName());
-
-            map.put(packet.getClass().getSimpleName(), times + 1);
-
-        } else {
-            map.put(packet.getClass().getSimpleName(), 0);
-            System.out.println(packet.getClass().getSimpleName());
-        }
-*/
         super.channelRead(context, packet);
     }
 
-    @Override // when picking up lots of items shit happends some invisible items on creative
+    @Override
     public void write(ChannelHandlerContext context, Object packet, ChannelPromise promise) throws Exception {
         if (packet instanceof ClientboundContainerSetSlotPacket slotPacket) enchantsToLore(slotPacket.getItem());
         if (packet instanceof ClientboundContainerSetContentPacket contentPacket) {
@@ -123,17 +111,6 @@ public class PacketHandler extends ChannelDuplexHandler {
                 enchantsToLore(pair.getSecond());
             }
         }
-/*
-        if (map.containsKey(packet.getClass().getSimpleName())) {
-            int times = map.get(packet.getClass().getSimpleName());
-
-            map.put(packet.getClass().getSimpleName(), times + 1);
-
-        } else {
-            map.put(packet.getClass().getSimpleName(), 0);
-            System.out.println(packet.getClass().getSimpleName());
-        }
-*/
         super.write(context, packet, promise);
     }
 

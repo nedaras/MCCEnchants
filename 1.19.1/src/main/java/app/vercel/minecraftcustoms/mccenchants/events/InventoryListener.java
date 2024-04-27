@@ -3,7 +3,7 @@ package app.vercel.minecraftcustoms.mccenchants.events;
 import app.vercel.minecraftcustoms.mccenchants.Main;
 import app.vercel.minecraftcustoms.mccenchants.api.helpers.MCCInventory;
 import app.vercel.minecraftcustoms.mccenchants.configs.MenuConfig;
-import app.vercel.minecraftcustoms.mccenchants.lib.MCCEnchantingTable;
+import app.vercel.minecraftcustoms.mccenchants.utils.MCCEnchantingTable;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -43,9 +43,7 @@ public class InventoryListener implements Listener {
 
     // TODO: someday add PAPI support
     // TODO: add a check if event is already canceled
-    // TODO: check a way to like make slots not interactive
     // TODO: add a check when player gets exp and update inv
-    // TODO: handle distance check for when inv should be closed and if other player breaks the inv or we die and more shit
     // TODO: when riding animals position events are not called
 
     private static final Map<UUID, Data> playerData = new HashMap<>();

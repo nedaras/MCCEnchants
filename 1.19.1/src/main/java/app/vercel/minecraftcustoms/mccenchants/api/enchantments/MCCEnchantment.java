@@ -20,14 +20,6 @@ import java.util.*;
 
 public abstract class MCCEnchantment implements Keyed, Translatable {
 
-    //public static @NotNull org.bukkit.enchantments.Enchantment toEnchantment(@NotNull MCCEnchantment enchantment) {
-        //return new CraftEnchantment(enchantment.getKey(), ((CraftMCCEnchantment) enchantment).getHandle());
-    //}
-
-    //public static @NotNull MCCEnchantment toMCCEnchantment(@NotNull org.bukkit.enchantments.Enchantment enchantment) {
-        //return new CraftMCCEnchantment(enchantment.getKey(), ((CraftEnchantment) enchantment).getHandle());
-    //}
-
     public MCCEnchantment() {}
 
     @NotNull
@@ -123,16 +115,8 @@ public abstract class MCCEnchantment implements Keyed, Translatable {
     @Contract("null -> null")
     @Nullable
     public static MCCEnchantment getByName(@Nullable String name) {
-        return null; // TODO: implement
-    }
-
-    // TODO: implement
-    ///** @deprecated */
-    @Deprecated
-    //@NotNull
-    public static org.bukkit.enchantments.Enchantment[] values() {
-        //return Lists.newArrayList(Registry.ENCHANTMENT).toArray(new org.bukkit.enchantments.Enchantment[0]);
-        return null;
+        Enchantment enchantment = Enchantment.getByName(name);
+        return enchantment == null ? null : CraftMCCEnchantment.bukkitToCustoms(enchantment);
     }
 
     @NotNull

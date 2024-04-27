@@ -1,4 +1,4 @@
-package app.vercel.minecraftcustoms.mccenchants.lib;
+package app.vercel.minecraftcustoms.mccenchants.utils;
 
 import com.google.common.collect.Lists;
 import net.minecraft.Util;
