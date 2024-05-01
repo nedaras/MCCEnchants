@@ -1,5 +1,6 @@
 package app.vercel.minecraftcustoms.mccenchants.configs;
 
+import app.vercel.minecraftcustoms.mccenchants.Main;
 import app.vercel.minecraftcustoms.mccenchants.utils.MCCEnchantingTable;
 import app.vercel.minecraftcustoms.mccenchants.utils.Utils;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
@@ -25,7 +26,6 @@ public class MenuConfig {
     private final YamlConfig config;
     private ContentItem[] content;
     private String title;
-    private int size;
     private int inputSlot;
     private int lapisSlot;
     private final Set<@NotNull Integer> outputSlots = new TreeSet<>();
@@ -75,6 +75,20 @@ public class MenuConfig {
 
             ItemMeta meta = item.getItemMeta();
             if (meta == null) return item;
+
+            NamespacedKey namespacedKey = new NamespacedKey(Main.getInstance(), "amount");
+            String amount = meta.getPersistentDataContainer().get(namespacedKey, PersistentDataType.STRING);
+            if (amount != null) {
+                for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+                    amount = amount .replaceAll("%" + entry.getKey() + "%", entry.getValue());
+                }
+                try {
+                    item.setAmount(Integer.parseInt(amount));
+                } catch (IllegalArgumentException __) {
+                    Main.getInstance().getLogger().log(Level.SEVERE, "[menu.yml] string: \"" + meta.getPersistentDataContainer().get(namespacedKey, PersistentDataType.STRING) + "\" can't be converted to integer.");
+                }
+                meta.getPersistentDataContainer().remove(namespacedKey);
+            }
 
             String displayName = meta.getDisplayName();
             List<String> lore = meta.getLore();
@@ -152,7 +166,7 @@ public class MenuConfig {
 
     public @NotNull Inventory getInventory(Player owner) {
         // TODO: when using papi we will need to update placeholders
-        Inventory inventory = Bukkit.createInventory(owner, size, title);
+        Inventory inventory = Bukkit.createInventory(owner, content.length, title);
         for (int i = 0; i < content.length; i++) {
             inventory.setItem(i, content[i] == null ? null : content[i].itemStack);
         }
@@ -281,30 +295,27 @@ public class MenuConfig {
     // TODO: add placeholder map
     private @NotNull ItemStack getItemStack(@NotNull String path) {
         String material = config.getConfig().getString(path + ".material", "STONE");
-        //int amount = config.getConfig().getInt(path + ".amount", 1);
         String amount = config.getConfig().getString(path + ".amount", "1");
-
-
-        System.out.println(amount);
-
-        try {
-            int a = Integer.parseInt(amount);
-        } catch (IllegalArgumentException __) {
-            if (amount.length() >= 3) {
-                System.out.println(amount.charAt(0) == '%');
-                System.out.println(amount.charAt(amount.length() - 1) == '%');
-            }
-            // throw error
-        }
 
         try {
             // TODO: add sub id like for leather items and other stuff
-            ItemStack itemStack = new ItemStack(Material.valueOf(material), 1);
+            ItemStack itemStack = new ItemStack(Material.valueOf(material));
             ItemMeta meta = itemStack.getItemMeta();
 
             if (meta == null) {
                 plugin.getLogger().log(Level.SEVERE, "[" + fileName + ".yml] Could not get item meta from material " + itemStack.getType() + ".");
                 return itemStack;
+            }
+
+            try {
+                itemStack.setAmount(Integer.parseInt(amount));
+            } catch (IllegalArgumentException __) {
+                if (amount.length() >= 3 && amount.charAt(0) == '%' && amount.charAt(amount.length() - 1) == '%') {
+                    NamespacedKey namespacedKey = new NamespacedKey(plugin, "amount");
+                    meta.getPersistentDataContainer().set(namespacedKey, PersistentDataType.STRING, amount);
+                } else {
+                    plugin.getLogger().log(Level.SEVERE, "[" + fileName + ".yml] " + path + ".amount: amount can only be an integer or a placeholder, got: " + amount + ".");
+                }
             }
 
             String displayName = config.getConfig().getString(path + ".display_name");
