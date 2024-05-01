@@ -16,9 +16,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.logging.Level;
 
 public class MenuConfig {
 
+    private final JavaPlugin plugin;
+    private final String fileName;
     private final YamlConfig config;
     private ContentItem[] content;
     private String title;
@@ -100,23 +103,33 @@ public class MenuConfig {
 
     }
     public MenuConfig(JavaPlugin plugin) {
-        this.config = new YamlConfig(plugin, "menu");
+        this.plugin = plugin;
+        this.fileName = "menu";
+        this.config = new YamlConfig(plugin, this.fileName);
         this.slotNamespace = new NamespacedKey(plugin, "slot");
         reload();
 
     }
 
     public void reload() {
-
         config.reloadConfig();
         outputSlots.clear();
 
-        // TODO: check if size is even logical
-        content = new ContentItem[config.getConfig().getInt("size")];
+        int size = config.getConfig().getInt("size");
+        if (size > 54) {
+            plugin.getLogger().log(Level.WARNING, "[" + fileName + ".yml] size: " + size + " is too big the maximum is 54.");
+            size = 54;
+        }
+
+        if (size % 9 != 0) {
+            plugin.getLogger().log(Level.WARNING, "[" + fileName + ".yml] size: " + size + " is not divisible by 9.");
+            size -= size % 9;
+        }
+
+        content = new ContentItem[size];
 
         // or idk add default name RED + NO NAME SET
         title = config.getConfig().getString("menu_title", "Enchantment Table");
-        size = config.getConfig().getInt("size");
 
         inputSlot = config.getConfig().getInt("input_slot");
         lapisSlot = config.getConfig().getInt("lapis_slot");
@@ -198,8 +211,8 @@ public class MenuConfig {
             ItemStack resultItem = content[i].getItemStack(STATE.ENCHANT, placeholders);
             ItemMeta meta = resultItem.getItemMeta();
 
-            // TODO: idk throw error??
             if (meta == null) {
+                plugin.getLogger().log(Level.SEVERE, "[" + fileName + ".yml] Could not get item meta from material " + resultItem.getType() + ".");
                 result[i] = content[i].getItemStack(STATE.DEFAULT, null);
                 continue;
             }
@@ -254,8 +267,10 @@ public class MenuConfig {
                 default -> STATE.DEFAULT;
             };
 
-            // throw error
-            if (i == STATE.DEFAULT) continue;
+            if (i == STATE.DEFAULT) {
+                plugin.getLogger().log(Level.WARNING, "[" + fileName + ".yml] " + path + ".states: state with name " + key + " does not exist.");
+                continue;
+            }
             result[i.state] = getItemStack(path + ".states." + key);
 
         }
@@ -266,15 +281,29 @@ public class MenuConfig {
     // TODO: add placeholder map
     private @NotNull ItemStack getItemStack(@NotNull String path) {
         String material = config.getConfig().getString(path + ".material", "STONE");
-        int amount = config.getConfig().getInt(path + ".amount", 1);
+        //int amount = config.getConfig().getInt(path + ".amount", 1);
+        String amount = config.getConfig().getString(path + ".amount", "1");
+
+
+        System.out.println(amount);
+
+        try {
+            int a = Integer.parseInt(amount);
+        } catch (IllegalArgumentException __) {
+            if (amount.length() >= 3) {
+                System.out.println(amount.charAt(0) == '%');
+                System.out.println(amount.charAt(amount.length() - 1) == '%');
+            }
+            // throw error
+        }
 
         try {
             // TODO: add sub id like for leather items and other stuff
-            ItemStack itemStack = new ItemStack(Material.valueOf(material), amount);
+            ItemStack itemStack = new ItemStack(Material.valueOf(material), 1);
             ItemMeta meta = itemStack.getItemMeta();
 
             if (meta == null) {
-                // print err or sum
+                plugin.getLogger().log(Level.SEVERE, "[" + fileName + ".yml] Could not get item meta from material " + itemStack.getType() + ".");
                 return itemStack;
             }
 
@@ -290,6 +319,7 @@ public class MenuConfig {
 
         } catch (IllegalArgumentException __) {
             // would be cool thing to like set error message in lore.
+            plugin.getLogger().log(Level.SEVERE, "[" + fileName + ".yml] " + path + ".material: material named " + material + " does not exist.");
             return new ItemStack(Material.STONE);
 
         }
@@ -307,22 +337,26 @@ public class MenuConfig {
             } catch (IllegalArgumentException __) {
                 try {
                     String[] range = i.split("-");
-                    // TODO: throw error or sum
-                    if (range.length != 2) continue;
+                    if (range.length != 2) {
+                        plugin.getLogger().log(Level.SEVERE, "[" + fileName + ".yml] " + path + ".slots: invalid range syntax, expected {start}-{end}, got: " + i + ".");
+                        continue;
+                    };
 
                     int a = Integer.parseInt(range[0]);
                     int b = Integer.parseInt(range[1]);
 
-                    // throw error
-                    if (a > b) continue;
+                    if (a > b) {
+                        plugin.getLogger().log(Level.WARNING, "[" + fileName + ".yml] " + path + ".slots: begin param is bigger then end param.");
+                        continue;
+                    }
 
                     for (int j = a; j <= b; j++) {
                         slots.add(j);
                     }
 
                 } catch (IllegalArgumentException ___) {
+                    plugin.getLogger().log(Level.SEVERE, "[" + fileName + ".yml] " + path + ".slots: invalid range syntax, ranges params can only have numbers.");
                     return slots;
-
                 }
             }
         }
