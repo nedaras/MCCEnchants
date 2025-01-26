@@ -2,7 +2,6 @@ package app.vercel.minecraftcustoms.mccenchants.enchantments;
 
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.EnchantmentRarity;
 import app.vercel.minecraftcustoms.mccenchants.api.enchantments.MCCEnchantment;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.apache.commons.lang.WordUtils;

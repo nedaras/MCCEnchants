@@ -38,10 +38,11 @@ public class PacketHandler extends ChannelDuplexHandler {
 
     public static void init() {
         try {
-            connectionField = ServerCommonPacketListenerImpl.class.getField("c");
+            connectionField = ServerCommonPacketListenerImpl.class.getDeclaredField("c");
             for (Player player : Bukkit.getOnlinePlayers()) addPlayer(player);
 
         } catch (NoSuchFieldException e) {
+            System.out.println("Ne sigma");
             throw new RuntimeException();
         }
     }
@@ -168,7 +169,7 @@ public class PacketHandler extends ChannelDuplexHandler {
         if (lore == null) lore = new ArrayList<>();
 
         for (Map.Entry<Enchantment, Integer> entry : getEnchantments(itemStack, meta).entrySet()) {
-            ChatColor color = CraftMCCEnchantment.bukkitToCustoms(entry.getKey()).isCursed() ? ChatColor.RED : ChatColor.GRAY;
+            ChatColor color = CraftMCCEnchantment.bukkitToCustoms(entry.getKey()).isCursed() ? ChatColor.RED : ChatColor.RESET;
             newLore.add(color + Utils.getEnchantmentName(entry.getKey(), entry.getValue()));
 
         }

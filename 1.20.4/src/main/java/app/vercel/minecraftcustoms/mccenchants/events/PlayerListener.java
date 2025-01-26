@@ -19,9 +19,4 @@ public class PlayerListener implements Listener {
         PacketHandler.removePlayer(event.getPlayer());
     }
 
-    @EventHandler
-    public void a(PlayerExpChangeEvent event) {
-        //System.out.println("xp xp xp");
-    }
-
 }
