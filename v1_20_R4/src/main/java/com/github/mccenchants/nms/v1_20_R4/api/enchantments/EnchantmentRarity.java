@@ -1,0 +1,21 @@
+package com.github.mccenchants.nms.v1_20_R4.api.enchantments;
+
+public enum EnchantmentRarity {
+
+    COMMON(10),
+    UNCOMMON(5),
+    RARE(2),
+    VERY_RARE(1);
+
+    private final int weight;
+
+    EnchantmentRarity(int var2) {
+        this.weight = var2;
+    }
+
+    public int getWeight() {
+        return weight;
+
+    }
+
+}

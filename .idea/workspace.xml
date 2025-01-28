@@ -1,20 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="f1115352-8ceb-4427-99c9-0522cfd74517" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/lib/MCCAnvil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/lib/MCCGrindstone.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/lib/Mathf.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/managers/Anvil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/managers/Grindstone.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/managers/InventoryManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/1.19.1/src/main/java/app/vercel/minecraftcustoms/mccenchants/managers/InventoryManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/resources/inventories/anvil.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/1.19.1/src/main/resources/inventories/grindstone.json" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dist/src/main/assembly/all-jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main/src/main/java/com/github/mccenchants/MCCEnchants.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main/src/main/resources/plugin.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/main/src/main/resources/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/v1_20_R4/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/src/main/java/app/vercel/minecraftcustoms/mccenchants/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/v1_20_R4/src/main/java/com/github/mccenchants/nms/v1_20_R4/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/src/main/java/app/vercel/minecraftcustoms/mccenchants/api/enchantments/EnchantmentRarity.java" beforeDir="false" afterPath="$PROJECT_DIR$/v1_20_R4/src/main/java/com/github/mccenchants/nms/v1_20_R4/api/enchantments/EnchantmentRarity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/src/main/java/app/vercel/minecraftcustoms/mccenchants/api/enchantments/MCCEnchantment.java" beforeDir="false" afterPath="$PROJECT_DIR$/v1_20_R4/src/main/java/com/github/mccenchants/nms/v1_20_R4/api/enchantments/MCCEnchantment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/src/main/java/app/vercel/minecraftcustoms/mccenchants/debug/MyEnchantment.java" beforeDir="false" afterPath="$PROJECT_DIR$/v1_20_R4/src/main/java/com/github/mccenchants/nms/v1_20_R4/debug/MyEnchantment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/src/main/java/app/vercel/minecraftcustoms/mccenchants/enchantments/CraftMCCEnchantment.java" beforeDir="false" afterPath="$PROJECT_DIR$/v1_20_R4/src/main/java/com/github/mccenchants/nms/v1_20_R4/enchantments/CraftMCCEnchantment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/src/main/java/app/vercel/minecraftcustoms/mccenchants/enchantments/NMSEnchantment.java" beforeDir="false" afterPath="$PROJECT_DIR$/v1_20_R4/src/main/java/com/github/mccenchants/nms/v1_20_R4/enchantments/NMSEnchantment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/src/main/java/app/vercel/minecraftcustoms/mccenchants/events/PlayerListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/v1_20_R4/src/main/java/com/github/mccenchants/nms/v1_20_R4/events/PlayerListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/src/main/java/app/vercel/minecraftcustoms/mccenchants/packets/PacketHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/v1_20_R4/src/main/java/com/github/mccenchants/nms/v1_20_R4/packets/PacketHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/src/main/java/app/vercel/minecraftcustoms/mccenchants/utils/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/v1_20_R4/src/main/java/com/github/mccenchants/nms/v1_20_R4/utils/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/src/main/resources/menu.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/1.20.4/src/main/resources/plugin.yml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -22,18 +48,85 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2BUQYGzLDfWnY6tw140HTkbDqk6" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/Plugins/MCCEnchants/1.19.1&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Maven.mccenchants [clean].executor": "Run",
+    "Maven.mccenchants [compile].executor": "Run",
+    "Maven.mccenchants [org.apache.maven.plugins:maven-assembly-plugin:3.7.1:single].executor": "Run",
+    "Maven.mccenchants-parent [clean,package...].executor": "Run",
+    "Maven.mccenchants-parent [clean].executor": "Run",
+    "Maven.mccenchants-parent [install].executor": "Run",
+    "Maven.mccenchants-parent [org.apache.maven.plugins:maven-clean-plugin:3.2.0:clean].executor": "Run",
+    "Maven.mccenchants-parent [org.apache.maven.plugins:maven-install-plugin:3.1.2:install].executor": "Run",
+    "Maven.mccenchants-v1_20_R4 [clean].executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "jdk.selected.JDK": "corretto-21",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/source/MCC"
+  },
+  "keyToStringList": {
+    "jdk.preference.JDK": [
+      "21=C:/Users/nedas/.jdks/corretto-21.0.6"
+    ]
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\source\MCC" />
+      <recent name="D:\source\MCC\main\src\main\resources" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\source\MCC\main\src\main\java" />
+      <recent name="D:\source\MCC\v1_20_R4\src\main\java\com\github\mccenchants\nms\v1_20_R4" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="mccenchants-parent [clean,package...]" type="MavenRunConfiguration" factoryName="Maven" nameIsGenerated="true">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="cmdOptions" />
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="clean" />
+                <option value="package" />
+                <option value="install" />
+              </list>
+            </option>
+            <option name="multimoduleDir" />
+            <option name="pomFileName" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="projectsCmdOptionValues">
+              <list />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
