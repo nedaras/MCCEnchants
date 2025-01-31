@@ -2,4 +2,4 @@ name: MCCEnchants
 authors: [ Nedarass ]
 version: ${project.version} (build ${BUILD_NUMBER})
 main: com.github.mccenchants.MCCEnchants
-api-version: 1.13s
+api-version: 1.13

@@ -1,7 +1,7 @@
 package com.github.mccenchants.nms.v1_20_R3.enchantments;
 
-import com.github.mccenchants.nms.v1_20_R3.api.enchantments.EnchantmentRarity;
-import com.github.mccenchants.nms.v1_20_R3.api.enchantments.MCCEnchantment;
+import com.github.mccenchants.enchantments.EnchantmentRarity;
+import com.github.mccenchants.enchantments.MCCEnchantment;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.enchantment.Enchantment;
 import org.apache.commons.lang.WordUtils;
@@ -54,6 +54,7 @@ public class CraftMCCEnchantment extends MCCEnchantment implements Handleable<En
     @Override
     @NotNull
     public String getName() {
+        // TODO: find a way to get these names cuz in minecraft console they're printed
         if (handle instanceof NMSEnchantment nms) return nms.getName();
         return switch (key.toString()) {
             case "minecraft:protection" -> "Protection";

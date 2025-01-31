@@ -54,7 +54,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>mccenchants-v1_20_R4</artifactId>
+            <artifactId>mccenchants-v1_20_R3</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>

@@ -1,7 +1,7 @@
-package com.github.mccenchants.nms.v1_20_R3.debug;
+package com.github.mccenchants;
 
-import com.github.mccenchants.nms.v1_20_R3.api.enchantments.EnchantmentRarity;
-import com.github.mccenchants.nms.v1_20_R3.api.enchantments.MCCEnchantment;
+import com.github.mccenchants.enchantments.EnchantmentRarity;
+import com.github.mccenchants.enchantments.MCCEnchantment;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;
@@ -70,7 +70,7 @@ public class MyEnchantment extends MCCEnchantment {
 
     @Override
     public boolean canEnchantItem(@NotNull ItemStack item) {
-        return true;
+        return getItemTarget().includes(item);
     }
 
     @Override

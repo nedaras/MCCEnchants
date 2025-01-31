@@ -1,7 +1,7 @@
-package com.github.mccenchants.nms.v1_20_R3.packets;
+package com.github.mccenchants.nms.v1_20_R3;
 
 import com.github.mccenchants.nms.v1_20_R3.enchantments.CraftMCCEnchantment;
-import com.github.mccenchants.nms.v1_20_R3.utils.Utils;
+import com.github.mccenchants.utils.Utils;
 import com.mojang.datafixers.util.Pair;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
@@ -14,7 +14,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.trading.MerchantOffer;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
@@ -34,21 +33,14 @@ import java.util.Map;
 
 public class PacketHandler extends ChannelDuplexHandler {
 
-    private static Field connectionField;
+    private final static @NotNull Field connectionField;
 
-    public static void init() {
+    static {
         try {
             connectionField = ServerCommonPacketListenerImpl.class.getDeclaredField("c");
-            for (Player player : Bukkit.getOnlinePlayers()) addPlayer(player);
-
         } catch (NoSuchFieldException e) {
             throw new RuntimeException();
         }
-    }
-
-    public static void deinit() {
-        for (Player player : Bukkit.getOnlinePlayers()) removePlayer(player);
-
     }
 
     private static Connection getConnection(ServerCommonPacketListenerImpl packetListener) {
@@ -160,7 +152,7 @@ public class PacketHandler extends ChannelDuplexHandler {
             //tag.putShort("MCCEnchants", (short) 0);
             return;
         }
-        if (getEnchantments(itemStack, meta).isEmpty()) return;
+        if (Utils.getEnchantments(itemStack, meta).isEmpty()) return;
 
 
         List<String> lore = meta.getLore();
@@ -168,9 +160,9 @@ public class PacketHandler extends ChannelDuplexHandler {
 
         if (lore == null) lore = new ArrayList<>();
 
-        for (Map.Entry<Enchantment, Integer> entry : getEnchantments(itemStack, meta).entrySet()) {
+        for (Map.Entry<Enchantment, Integer> entry : Utils.getEnchantments(itemStack, meta).entrySet()) {
             ChatColor color = CraftMCCEnchantment.bukkitToCustoms(entry.getKey()).isCursed() ? ChatColor.RED : ChatColor.GRAY;
-            newLore.add(color + Utils.getEnchantmentName(entry.getKey(), entry.getValue()));
+            newLore.add(color + getEnchantmentName(entry.getKey(), entry.getValue()));
 
         }
 
@@ -182,15 +174,17 @@ public class PacketHandler extends ChannelDuplexHandler {
         itemStack.setItemMeta(meta);
 
         CompoundTag tag = minecraftItemStack.getOrCreateTag();
-        tag.putShort("MCCEnchants", (short) getEnchantments(itemStack, meta).size());
+        tag.putShort("MCCEnchants", (short) Utils.getEnchantments(itemStack, meta).size());
 
     }
 
-    private static Map<Enchantment, Integer> getEnchantments(ItemStack itemStack, ItemMeta meta) {
-        if (meta instanceof EnchantmentStorageMeta storageMeta) return storageMeta.getStoredEnchants();
-        return itemStack.getEnchantments();
+    private static String getEnchantmentName(Enchantment enchantment, int level) {
+        String levelString = enchantment.getMaxLevel() == 1 ? "" : " " + Utils.roman(level);
+        return CraftMCCEnchantment.bukkitToCustoms(enchantment).getName() + levelString;
     }
 
+    // Why did spigot changed these names
+    // TODO: if possible remove these flag things out of here
     private static boolean hasHideFlag(ItemMeta meta) {
         if (meta instanceof EnchantmentStorageMeta) return meta.hasItemFlag(ItemFlag.HIDE_POTION_EFFECTS);
         return meta.hasItemFlag(ItemFlag.HIDE_ENCHANTS);
@@ -209,7 +203,7 @@ public class PacketHandler extends ChannelDuplexHandler {
             meta.removeItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
             return;
         }
-        meta.removeItemFlags(ItemFlag.HIDE_ENCHANTS);
+        meta.removeItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
     }
 
 }

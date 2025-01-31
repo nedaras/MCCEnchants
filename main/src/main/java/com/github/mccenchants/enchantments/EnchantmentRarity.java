@@ -1,4 +1,4 @@
-package com.github.mccenchants.api;
+package com.github.mccenchants.enchantments;
 
 public enum EnchantmentRarity {
     COMMON(10),
