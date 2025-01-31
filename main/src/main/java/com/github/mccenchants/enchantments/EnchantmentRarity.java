@@ -1,7 +1,6 @@
-package com.github.mccenchants.nms.v1_20_R4.api.enchantments;
+package com.github.mccenchants.api;
 
 public enum EnchantmentRarity {
-
     COMMON(10),
     UNCOMMON(5),
     RARE(2),
@@ -15,7 +14,5 @@ public enum EnchantmentRarity {
 
     public int getWeight() {
         return weight;
-
     }
-
 }

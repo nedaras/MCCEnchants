@@ -1,7 +1,7 @@
-package com.github.mccenchants.nms.v1_20_R4.debug;
+package com.github.mccenchants.nms.v1_20_R3.debug;
 
-import com.github.mccenchants.nms.v1_20_R4.api.enchantments.EnchantmentRarity;
-import com.github.mccenchants.nms.v1_20_R4.api.enchantments.MCCEnchantment;
+import com.github.mccenchants.nms.v1_20_R3.api.enchantments.EnchantmentRarity;
+import com.github.mccenchants.nms.v1_20_R3.api.enchantments.MCCEnchantment;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.inventory.ItemStack;

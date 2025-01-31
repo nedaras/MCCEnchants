@@ -1,6 +1,6 @@
-package com.github.mccenchants.nms.v1_20_R4.events;
+package com.github.mccenchants.nms.v1_20_R3.events;
 
-import com.github.mccenchants.nms.v1_20_R4.packets.PacketHandler;
+import com.github.mccenchants.nms.v1_20_R3.packets.PacketHandler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;

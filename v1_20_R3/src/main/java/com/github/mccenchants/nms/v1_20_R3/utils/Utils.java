@@ -1,6 +1,6 @@
-package com.github.mccenchants.nms.v1_20_R4.utils;
+package com.github.mccenchants.nms.v1_20_R3.utils;
 
-import com.github.mccenchants.nms.v1_20_R4.enchantments.CraftMCCEnchantment;
+import com.github.mccenchants.nms.v1_20_R3.enchantments.CraftMCCEnchantment;
 import org.bukkit.enchantments.Enchantment;
 
 public class Utils {

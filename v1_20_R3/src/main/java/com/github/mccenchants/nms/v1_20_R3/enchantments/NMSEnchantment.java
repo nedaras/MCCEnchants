@@ -1,7 +1,7 @@
-package com.github.mccenchants.nms.v1_20_R4.enchantments;
+package com.github.mccenchants.nms.v1_20_R3.enchantments;
 
-import com.github.mccenchants.nms.v1_20_R4.api.enchantments.EnchantmentRarity;
-import com.github.mccenchants.nms.v1_20_R4.api.enchantments.MCCEnchantment;
+import com.github.mccenchants.nms.v1_20_R3.api.enchantments.EnchantmentRarity;
+import com.github.mccenchants.nms.v1_20_R3.api.enchantments.MCCEnchantment;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;

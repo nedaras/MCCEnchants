@@ -1,7 +1,7 @@
-package com.github.mccenchants.nms.v1_20_R4.packets;
+package com.github.mccenchants.nms.v1_20_R3.packets;
 
-import com.github.mccenchants.nms.v1_20_R4.enchantments.CraftMCCEnchantment;
-import com.github.mccenchants.nms.v1_20_R4.utils.Utils;
+import com.github.mccenchants.nms.v1_20_R3.enchantments.CraftMCCEnchantment;
+import com.github.mccenchants.nms.v1_20_R3.utils.Utils;
 import com.mojang.datafixers.util.Pair;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;

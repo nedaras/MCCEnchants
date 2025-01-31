@@ -1,9 +1,9 @@
-package com.github.mccenchants.nms.v1_20_R4;
+package com.github.mccenchants.nms.v1_20_R3;
 
-import com.github.mccenchants.nms.v1_20_R4.api.enchantments.MCCEnchantment;
-import com.github.mccenchants.nms.v1_20_R4.debug.MyEnchantment;
-import com.github.mccenchants.nms.v1_20_R4.events.PlayerListener;
-import com.github.mccenchants.nms.v1_20_R4.packets.PacketHandler;
+import com.github.mccenchants.nms.v1_20_R3.api.enchantments.MCCEnchantment;
+import com.github.mccenchants.nms.v1_20_R3.debug.MyEnchantment;
+import com.github.mccenchants.nms.v1_20_R3.events.PlayerListener;
+import com.github.mccenchants.nms.v1_20_R3.packets.PacketHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Main extends JavaPlugin {
